@@ -15,7 +15,7 @@ public class RepuestoDAO implements BaseDAO<Repuesto, Integer> {
         Repuesto r = new Repuesto();
         r.setIdRepuesto(rs.getInt("id_repuesto"));
         r.setNombre(rs.getString("nombre"));
-        r.setCostoUnitario(rs.getString("costo_unitario"));
+        r.setCostoUnitario(rs.getDouble("costo_unitario"));
         r.setStockDisponible(rs.getInt("stock_disponible"));
         return r;
     }
@@ -27,7 +27,7 @@ public class RepuestoDAO implements BaseDAO<Repuesto, Integer> {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, entity.getIdRepuesto());
             ps.setString(2, entity.getNombre());
-            ps.setString(3, entity.getCostoUnitario());
+            ps.setDouble(3, entity.getCostoUnitario());
             ps.setInt(4, entity.getStockDisponible());
             ps.executeUpdate();
         }
@@ -40,7 +40,7 @@ public class RepuestoDAO implements BaseDAO<Repuesto, Integer> {
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, entity.getNombre());
-            ps.setString(2, entity.getCostoUnitario());
+            ps.setDouble(2, entity.getCostoUnitario());
             ps.setInt(3, entity.getStockDisponible());
             ps.setInt(4, entity.getIdRepuesto());
             return ps.executeUpdate() > 0;

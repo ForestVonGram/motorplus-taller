@@ -14,9 +14,9 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
     private Factura map(ResultSet rs) throws SQLException {
         Factura f = new Factura();
         f.setIdFactura(rs.getInt("id_factura"));
-        f.setCostoManoObra(rs.getString("costo_mano_obra"));
-        f.setTotal(rs.getString("total"));
-        f.setImpuestos(rs.getString("impuestos"));
+        f.setCostoManoObra(rs.getDouble("costo_mano_obra"));
+        f.setTotal(rs.getDouble("total"));
+        f.setImpuesto(rs.getDouble("impuesto"));
         Date fe = rs.getDate("fecha_emision");
         f.setFechaEmision(fe != null ? fe.toLocalDate() : null);
         f.setEstadoPago(rs.getString("estado_pago"));
@@ -26,13 +26,13 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
 
     @Override
     public Factura insert(Factura entity) throws SQLException {
-        String sql = "INSERT INTO " + TABLE + " (id_factura, costo_mano_obra, total, impuestos, fecha_emision, estado_pago, id_orden) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO " + TABLE + " (id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden) VALUES (?,?,?,?,?,?,?)";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, entity.getIdFactura());
-            ps.setString(2, entity.getCostoManoObra());
-            ps.setString(3, entity.getTotal());
-            ps.setString(4, entity.getImpuestos());
+            ps.setDouble(2, entity.getCostoManoObra());
+            ps.setDouble(3, entity.getTotal());
+            ps.setDouble(4, entity.getImpuesto());
             ps.setDate(5, entity.getFechaEmision() != null ? Date.valueOf(entity.getFechaEmision()) : null);
             ps.setString(6, entity.getEstadoPago());
             ps.setInt(7, entity.getIdOrden());
@@ -43,12 +43,12 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
 
     @Override
     public boolean update(Factura entity) throws SQLException {
-        String sql = "UPDATE " + TABLE + " SET costo_mano_obra=?, total=?, impuestos=?, fecha_emision=?, estado_pago=?, id_orden=? WHERE id_factura=?";
+        String sql = "UPDATE " + TABLE + " SET costo_mano_obra=?, total=?, impuesto=?, fecha_emision=?, estado_pago=?, id_orden=? WHERE id_factura=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, entity.getCostoManoObra());
-            ps.setString(2, entity.getTotal());
-            ps.setString(3, entity.getImpuestos());
+            ps.setDouble(1, entity.getCostoManoObra());
+            ps.setDouble(2, entity.getTotal());
+            ps.setDouble(3, entity.getImpuesto());
             ps.setDate(4, entity.getFechaEmision() != null ? Date.valueOf(entity.getFechaEmision()) : null);
             ps.setString(5, entity.getEstadoPago());
             ps.setInt(6, entity.getIdOrden());
@@ -69,7 +69,7 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
 
     @Override
     public Optional<Factura> findById(Integer id) throws SQLException {
-        String sql = "SELECT id_factura, costo_mano_obra, total, impuestos, fecha_emision, estado_pago, id_orden FROM " + TABLE + " WHERE id_factura=?";
+        String sql = "SELECT id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden FROM " + TABLE + " WHERE id_factura=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -82,7 +82,7 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
 
     @Override
     public List<Factura> findAll() throws SQLException {
-        String sql = "SELECT id_factura, costo_mano_obra, total, impuestos, fecha_emision, estado_pago, id_orden FROM " + TABLE;
+        String sql = "SELECT id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden FROM " + TABLE;
         List<Factura> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

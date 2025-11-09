@@ -6,7 +6,7 @@ public class OrdenTrabajo {
     private int idOrden;
     private LocalDate fechaIngreso;
     private String diagnosticoInicial;
-    private LocalDate fechaFinalizacion;
+    private LocalDate fechaFinalizacion;  // nullable
     private String placa; // FK -> Vehiculo
 
     public OrdenTrabajo() {}

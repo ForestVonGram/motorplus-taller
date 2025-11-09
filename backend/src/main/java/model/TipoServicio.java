@@ -3,7 +3,7 @@ package model;
 public class TipoServicio {
     private int idTipo;
     private String nombreTipo;
-    private String descripcionTipo;
+    private String descripcionTipo;  // nullable
 
     public TipoServicio() {}
 

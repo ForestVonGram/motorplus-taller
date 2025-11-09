@@ -4,13 +4,15 @@ public class Cliente {
     private int idCliente;
     private String nombre;
     private String apellido;
+    private String contrasenia;
 
     public Cliente() {}
 
-    public Cliente(int idCliente, String nombre, String apellido) {
+    public Cliente(int idCliente, String nombre, String apellido, String contrasenia) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.contrasenia = contrasenia;
     }
 
     public int getIdCliente() {
@@ -35,5 +37,13 @@ public class Cliente {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    public String getContrasenia() {
+        return contrasenia;
+    }
+
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
     }
 }

@@ -1,26 +1,16 @@
 package model;
 
 public class NumeroProveedor {
-    private int idNumero;
-    private String numero;
-    private String descripcion;
-    private int idProveedor; // FK -> Proveedor
+    private String numero;       // PK
+    private String descripcion;  // nullable
+    private int idProveedor;     // FK -> Proveedor
 
     public NumeroProveedor() {}
 
-    public NumeroProveedor(int idNumero, String numero, String descripcion, int idProveedor) {
-        this.idNumero = idNumero;
+    public NumeroProveedor(String numero, String descripcion, int idProveedor) {
         this.numero = numero;
         this.descripcion = descripcion;
         this.idProveedor = idProveedor;
-    }
-
-    public int getIdNumero() {
-        return idNumero;
-    }
-
-    public void setIdNumero(int idNumero) {
-        this.idNumero = idNumero;
     }
 
     public String getNumero() {

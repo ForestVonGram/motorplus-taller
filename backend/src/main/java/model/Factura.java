@@ -4,20 +4,20 @@ import java.time.LocalDate;
 
 public class Factura {
     private int idFactura;
-    private String costoManoObra;
-    private String total;
-    private String impuestos;
+    private double costoManoObra;
+    private double total;
+    private double impuesto;
     private LocalDate fechaEmision;
     private String estadoPago; // pendiente, pagada, etc.
     private int idOrden; // FK -> OrdenTrabajo
 
     public Factura() {}
 
-    public Factura(int idFactura, String costoManoObra, String total, String impuestos, LocalDate fechaEmision, String estadoPago, int idOrden) {
+    public Factura(int idFactura, double costoManoObra, double total, double impuesto, LocalDate fechaEmision, String estadoPago, int idOrden) {
         this.idFactura = idFactura;
         this.costoManoObra = costoManoObra;
         this.total = total;
-        this.impuestos = impuestos;
+        this.impuesto = impuesto;
         this.fechaEmision = fechaEmision;
         this.estadoPago = estadoPago;
         this.idOrden = idOrden;
@@ -31,28 +31,28 @@ public class Factura {
         this.idFactura = idFactura;
     }
 
-    public String getCostoManoObra() {
+    public double getCostoManoObra() {
         return costoManoObra;
     }
 
-    public void setCostoManoObra(String costoManoObra) {
+    public void setCostoManoObra(double costoManoObra) {
         this.costoManoObra = costoManoObra;
     }
 
-    public String getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(String total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
-    public String getImpuestos() {
-        return impuestos;
+    public double getImpuesto() {
+        return impuesto;
     }
 
-    public void setImpuestos(String impuestos) {
-        this.impuestos = impuestos;
+    public void setImpuesto(double impuesto) {
+        this.impuesto = impuesto;
     }
 
     public LocalDate getFechaEmision() {

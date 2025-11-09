@@ -1,24 +1,14 @@
 package model;
 
 public class DetalleServicio {
-    private int idDetalleServicio;
-    private int idServicio; // FK -> Servicio
-    private int idOrden;    // FK -> OrdenTrabajo
+    private int idServicio; // FK -> Servicio (parte de PK compuesta)
+    private int idOrden;    // FK -> OrdenTrabajo (parte de PK compuesta)
 
     public DetalleServicio() {}
 
-    public DetalleServicio(int idDetalleServicio, int idServicio, int idOrden) {
-        this.idDetalleServicio = idDetalleServicio;
+    public DetalleServicio(int idServicio, int idOrden) {
         this.idServicio = idServicio;
         this.idOrden = idOrden;
-    }
-
-    public int getIdDetalleServicio() {
-        return idDetalleServicio;
-    }
-
-    public void setIdDetalleServicio(int idDetalleServicio) {
-        this.idDetalleServicio = idDetalleServicio;
     }
 
     public int getIdServicio() {

@@ -3,16 +3,16 @@ package model;
 public class Servicio {
     private int idServicio;
     private String nombre;
-    private String descripcion;
+    private String descripcion;  // nullable
     private int idTipo; // FK -> TipoServicio
 
     public Servicio() {}
 
     public Servicio(int idServicio, String nombre, String descripcion, int idTipo) {
-      this.idServicio = idServicio;
-      this.nombre = nombre;
-      this.descripcion = descripcion;
-      this.idTipo = idTipo;
+        this.idServicio = idServicio;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.idTipo = idTipo;
     }
 
     public int getIdServicio() {

@@ -15,7 +15,7 @@ public class VehiculoDAO implements BaseDAO<Vehiculo, String> {
         Vehiculo v = new Vehiculo();
         v.setPlaca(rs.getString("placa"));
         v.setMarca(rs.getString("marca"));
-        v.setAnio(rs.getString("anio"));
+        v.setAnio(rs.getInt("anio"));
         v.setIdCliente(rs.getInt("id_cliente"));
         return v;
     }
@@ -27,7 +27,7 @@ public class VehiculoDAO implements BaseDAO<Vehiculo, String> {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, entity.getPlaca());
             ps.setString(2, entity.getMarca());
-            ps.setString(3, entity.getAnio());
+            ps.setInt(3, entity.getAnio());
             ps.setInt(4, entity.getIdCliente());
             ps.executeUpdate();
         }
@@ -40,7 +40,7 @@ public class VehiculoDAO implements BaseDAO<Vehiculo, String> {
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, entity.getMarca());
-            ps.setString(2, entity.getAnio());
+            ps.setInt(2, entity.getAnio());
             ps.setInt(3, entity.getIdCliente());
             ps.setString(4, entity.getPlaca());
             return ps.executeUpdate() > 0;

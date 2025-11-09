@@ -3,12 +3,12 @@ package model;
 public class Repuesto {
     private int idRepuesto;
     private String nombre;
-    private String costoUnitario;
+    private double costoUnitario;
     private int stockDisponible;
 
     public Repuesto() {}
 
-    public Repuesto(int idRepuesto, String nombre, String costoUnitario, int stockDisponible) {
+    public Repuesto(int idRepuesto, String nombre, double costoUnitario, int stockDisponible) {
         this.idRepuesto = idRepuesto;
         this.nombre = nombre;
         this.costoUnitario = costoUnitario;
@@ -31,11 +31,11 @@ public class Repuesto {
         this.nombre = nombre;
     }
 
-    public String getCostoUnitario() {
+    public double getCostoUnitario() {
         return costoUnitario;
     }
 
-    public void setCostoUnitario(String costoUnitario) {
+    public void setCostoUnitario(double costoUnitario) {
         this.costoUnitario = costoUnitario;
     }
 

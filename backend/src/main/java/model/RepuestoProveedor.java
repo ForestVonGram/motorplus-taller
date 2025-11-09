@@ -1,24 +1,14 @@
 package model;
 
 public class RepuestoProveedor {
-    private int idDetalleProveedor;
-    private int idRepuesto;  // FK -> Repuesto
-    private int idProveedor; // FK -> Proveedor
+    private int idRepuesto;  // FK -> Repuesto (parte de PK compuesta)
+    private int idProveedor; // FK -> Proveedor (parte de PK compuesta)
 
     public RepuestoProveedor() {}
 
-    public RepuestoProveedor(int idDetalleProveedor, int idRepuesto, int idProveedor) {
-        this.idDetalleProveedor = idDetalleProveedor;
+    public RepuestoProveedor(int idRepuesto, int idProveedor) {
         this.idRepuesto = idRepuesto;
         this.idProveedor = idProveedor;
-    }
-
-    public int getIdDetalleProveedor() {
-        return idDetalleProveedor;
-    }
-
-    public void setIdDetalleProveedor(int idDetalleProveedor) {
-        this.idDetalleProveedor = idDetalleProveedor;
     }
 
     public int getIdRepuesto() {

@@ -1,26 +1,16 @@
 package model;
 
 public class DetalleOrden {
-    private int idDetalleOrden;
-    private int idOrden;     // FK -> OrdenTrabajo
-    private int idMecanico;  // FK -> Mecanico
+    private int idOrden;     // FK -> OrdenTrabajo (parte de PK compuesta)
+    private int idMecanico;  // FK -> Mecanico (parte de PK compuesta)
     private String rolMecanico;
 
     public DetalleOrden() {}
 
-    public DetalleOrden(int idDetalleOrden, int idOrden, int idMecanico, String rolMecanico) {
-        this.idDetalleOrden = idDetalleOrden;
+    public DetalleOrden(int idOrden, int idMecanico, String rolMecanico) {
         this.idOrden = idOrden;
         this.idMecanico = idMecanico;
         this.rolMecanico = rolMecanico;
-    }
-
-    public int getIdDetalleOrden() {
-        return idDetalleOrden;
-    }
-
-    public void setIdDetalleOrden(int idDetalleOrden) {
-        this.idDetalleOrden = idDetalleOrden;
     }
 
     public int getIdOrden() {

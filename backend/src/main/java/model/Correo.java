@@ -1,32 +1,22 @@
 package model;
 
 public class Correo {
-    private int idCorreo;
-    private String descripcion;
-    private int idCliente; // FK -> Cliente
+    private String drcCorreo;  // PK
+    private int idCliente;     // FK -> Cliente
 
     public Correo() {}
 
-    public Correo(int idCorreo, String descripcion, int idCliente) {
-        this.idCorreo = idCorreo;
-        this.descripcion = descripcion;
+    public Correo(String drcCorreo, int idCliente) {
+        this.drcCorreo = drcCorreo;
         this.idCliente = idCliente;
     }
 
-    public int getIdCorreo() {
-        return idCorreo;
+    public String getDrcCorreo() {
+        return drcCorreo;
     }
 
-    public void setIdCorreo(int idCorreo) {
-        this.idCorreo = idCorreo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDrcCorreo(String drcCorreo) {
+        this.drcCorreo = drcCorreo;
     }
 
     public int getIdCliente() {

@@ -3,12 +3,12 @@ package model;
 public class Vehiculo {
     private String placa; // PK
     private String marca;
-    private String anio;
+    private int anio;
     private int idCliente; // FK -> Cliente
 
     public Vehiculo() {}
 
-    public Vehiculo(String placa, String marca, String anio, int idCliente) {
+    public Vehiculo(String placa, String marca, int anio, int idCliente) {
         this.placa = placa;
         this.marca = marca;
         this.anio = anio;
@@ -31,11 +31,11 @@ public class Vehiculo {
         this.marca = marca;
     }
 
-    public String getAnio() {
+    public int getAnio() {
         return anio;
     }
 
-    public void setAnio(String anio) {
+    public void setAnio(int anio) {
         this.anio = anio;
     }
 

@@ -2,9 +2,9 @@ package model;
 
 public class Telefono {
     private int idTelefono;
-    private String numero;
-    private String descripcion;
-    private int idCliente; // FK -> Cliente
+    private String numero;        // max 20 chars
+    private String descripcion;   // max 20 chars, nullable
+    private int idCliente;        // FK -> Cliente
 
     public Telefono() {}
 

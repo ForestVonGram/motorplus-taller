@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class NumeroProveedorDAO implements BaseDAO<NumeroProveedor, Integer> {
+public class NumeroProveedorDAO implements BaseDAO<NumeroProveedor, String> {
     private static final String TABLE = "numero_proveedor";
 
     private NumeroProveedor map(ResultSet rs) throws SQLException {
         NumeroProveedor n = new NumeroProveedor();
-        n.setIdNumero(rs.getInt("id_numero"));
         n.setNumero(rs.getString("numero"));
         n.setDescripcion(rs.getString("descripcion"));
         n.setIdProveedor(rs.getInt("id_proveedor"));
@@ -22,13 +21,12 @@ public class NumeroProveedorDAO implements BaseDAO<NumeroProveedor, Integer> {
 
     @Override
     public NumeroProveedor insert(NumeroProveedor entity) throws SQLException {
-        String sql = "INSERT INTO " + TABLE + " (id_numero, numero, descripcion, id_proveedor) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO " + TABLE + " (numero, descripcion, id_proveedor) VALUES (?,?,?)";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, entity.getIdNumero());
-            ps.setString(2, entity.getNumero());
-            ps.setString(3, entity.getDescripcion());
-            ps.setInt(4, entity.getIdProveedor());
+            ps.setString(1, entity.getNumero());
+            ps.setString(2, entity.getDescripcion());
+            ps.setInt(3, entity.getIdProveedor());
             ps.executeUpdate();
         }
         return entity;
@@ -36,33 +34,32 @@ public class NumeroProveedorDAO implements BaseDAO<NumeroProveedor, Integer> {
 
     @Override
     public boolean update(NumeroProveedor entity) throws SQLException {
-        String sql = "UPDATE " + TABLE + " SET numero=?, descripcion=?, id_proveedor=? WHERE id_numero=?";
+        String sql = "UPDATE " + TABLE + " SET descripcion=?, id_proveedor=? WHERE numero=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, entity.getNumero());
-            ps.setString(2, entity.getDescripcion());
-            ps.setInt(3, entity.getIdProveedor());
-            ps.setInt(4, entity.getIdNumero());
+            ps.setString(1, entity.getDescripcion());
+            ps.setInt(2, entity.getIdProveedor());
+            ps.setString(3, entity.getNumero());
             return ps.executeUpdate() > 0;
         }
     }
 
     @Override
-    public boolean delete(Integer id) throws SQLException {
-        String sql = "DELETE FROM " + TABLE + " WHERE id_numero=?";
+    public boolean delete(String numero) throws SQLException {
+        String sql = "DELETE FROM " + TABLE + " WHERE numero=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setString(1, numero);
             return ps.executeUpdate() > 0;
         }
     }
 
     @Override
-    public Optional<NumeroProveedor> findById(Integer id) throws SQLException {
-        String sql = "SELECT id_numero, numero, descripcion, id_proveedor FROM " + TABLE + " WHERE id_numero=?";
+    public Optional<NumeroProveedor> findById(String numero) throws SQLException {
+        String sql = "SELECT numero, descripcion, id_proveedor FROM " + TABLE + " WHERE numero=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setString(1, numero);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return Optional.of(map(rs));
             }
@@ -72,7 +69,7 @@ public class NumeroProveedorDAO implements BaseDAO<NumeroProveedor, Integer> {
 
     @Override
     public List<NumeroProveedor> findAll() throws SQLException {
-        String sql = "SELECT id_numero, numero, descripcion, id_proveedor FROM " + TABLE;
+        String sql = "SELECT numero, descripcion, id_proveedor FROM " + TABLE;
         List<NumeroProveedor> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
