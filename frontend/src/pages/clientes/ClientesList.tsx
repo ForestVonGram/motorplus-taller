@@ -3,13 +3,10 @@ import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
 interface Cliente {
-  id: number;
+  id_cliente: number;
   nombre: string;
   apellido: string;
-  email: string;
-  telefono: string;
-  vehiculosCount: number;
-  fechaRegistro: string;
+  contrasenia: string;
 }
 
 const ClientesList = () => {
@@ -19,24 +16,35 @@ const ClientesList = () => {
   useEffect(() => {
     const mockData: Cliente[] = [
       {
-        id: 1,
+        id_cliente: 1,
         nombre: 'Juan Carlos',
         apellido: 'López',
-        email: 'jc.lopez@email.com',
-        telefono: '+56 9 1234 5678',
-        vehiculosCount: 1,
-        fechaRegistro: '15-03-2021'
+        contrasenia: '********'
       },
       {
-        id: 2,
+        id_cliente: 2,
         nombre: 'Magdalena',
         apellido: 'Arancibia',
-        email: 'm.arancibia@email.com',
-        telefono: '+56 9 8765 4321',
-        vehiculosCount: 1,
-        fechaRegistro: '22-05-2021'
+        contrasenia: '********'
       },
-      // Agregar más datos mock aquí...
+      {
+        id_cliente: 3,
+        nombre: 'Roberto',
+        apellido: 'Fernández',
+        contrasenia: '********'
+      },
+      {
+        id_cliente: 4,
+        nombre: 'Carolina',
+        apellido: 'Muñoz',
+        contrasenia: '********'
+      },
+      {
+        id_cliente: 5,
+        nombre: 'Diego',
+        apellido: 'Vargas',
+        contrasenia: '********'
+      },
     ];
 
     setTimeout(() => {
@@ -47,32 +55,23 @@ const ClientesList = () => {
 
   const columns: Column[] = [
     {
+      key: 'id_cliente',
+      header: 'ID',
+      render: (_, row) => `CLI-${String(row.id_cliente).padStart(3, '0')}`
+    },
+    {
       key: 'nombre',
-      header: 'Nombre Completo',
-      render: (_, row) => `${row.nombre} ${row.apellido}`
+      header: 'Nombre',
     },
     {
-      key: 'email',
-      header: 'Email',
+      key: 'apellido',
+      header: 'Apellido',
     },
     {
-      key: 'telefono',
-      header: 'Teléfono',
+      key: 'contrasenia',
+      header: 'Contraseña',
+      render: () => '********'
     },
-    {
-      key: 'vehiculos',
-      header: 'Vehículos',
-      render: (_, row) => (
-        <span className="badge badge-primary">
-          {row.vehiculosCount} vehículo(s)
-        </span>
-      )
-    },
-    {
-      key: 'fecha',
-      header: 'Fecha Registro',
-      render: (_, row) => row.fechaRegistro
-    }
   ];
 
   const handleAction = (cliente: Cliente) => {

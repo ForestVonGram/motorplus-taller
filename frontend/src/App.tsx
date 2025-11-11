@@ -5,6 +5,11 @@ import Dashboard from './pages/dashboard/Dashboard';
 import VehiculosList from './pages/vehiculos/VehiculosList';
 import ClientesList from './pages/clientes/ClientesList';
 import OrdenesList from './pages/ordenes/OrdenesList';
+import MecanicosList from './pages/mecanicos/MecanicosList';
+import FacturasList from './pages/facturas/FacturasList';
+import RepuestosList from './pages/repuestos/RepuestosList';
+import ProveedoresList from './pages/proveedores/ProveedoresList';
+import ServiciosList from './pages/servicios/ServiciosList';
 import './App.css';
 import ReportesList from './pages/reportes/ReportesList';
 
@@ -21,11 +26,11 @@ function App() {
         <Route path="/ordenes" element={<Layout><OrdenesList /></Layout>} />
         
         {/* Páginas placeholder - crear después */}
-        <Route path="/mecanicos" element={<Layout><div className="vehiculos-page"><h1>Mecánicos</h1><p>Página en construcción</p></div></Layout>} />
-        <Route path="/facturas" element={<Layout><div className="vehiculos-page"><h1>Facturas</h1><p>Página en construcción</p></div></Layout>} />
-        <Route path="/repuestos" element={<Layout><div className="vehiculos-page"><h1>Repuestos</h1><p>Página en construcción</p></div></Layout>} />
-        <Route path="/proveedores" element={<Layout><div className="vehiculos-page"><h1>Proveedores</h1><p>Página en construcción</p></div></Layout>} />
-        <Route path="/servicios" element={<Layout><div className="vehiculos-page"><h1>Servicios</h1><p>Página en construcción</p></div></Layout>} />
+        <Route path="/mecanicos" element={<Layout><MecanicosList /></Layout>} />
+        <Route path="/facturas" element={<Layout><FacturasList /></Layout>} />
+        <Route path="/repuestos" element={<Layout><RepuestosList /></Layout>} />
+        <Route path="/proveedores" element={<Layout><ProveedoresList /></Layout>} />
+        <Route path="/servicios" element={<Layout><ServiciosList /></Layout>} />
         <Route path="/reportes" element={<Layout><ReportesList /></Layout>} />
       </Routes>
     </BrowserRouter>

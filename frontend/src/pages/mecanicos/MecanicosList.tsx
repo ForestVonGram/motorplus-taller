@@ -1,16 +1,11 @@
-    import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
 interface Mecanico {
-  id: number;
+  id_mecanico: number;
   nombre: string;
-  apellido: string;
-  especialidad: string;
-  experiencia: number; // años de experiencia
-  estado: 'Activo' | 'Inactivo' | 'En Servicio';
-  telefono: string;
-  fechaContratacion: string;
+  id_supervisor: number | null;
 }
 
 const MecanicosList = () => {
@@ -20,54 +15,39 @@ const MecanicosList = () => {
   useEffect(() => {
     const mockData: Mecanico[] = [
       {
-        id: 1,
-        nombre: 'Carlos',
-        apellido: 'Mendoza',
-        especialidad: 'Motor',
-        experiencia: 8,
-        estado: 'Activo',
-        telefono: '+56 9 1234 5678',
-        fechaContratacion: '15-01-2020'
+        id_mecanico: 1,
+        nombre: 'Carlos Mendoza',
+        id_supervisor: null
       },
       {
-        id: 2,
-        nombre: 'María',
-        apellido: 'González',
-        especialidad: 'Transmisión',
-        experiencia: 5,
-        estado: 'En Servicio',
-        telefono: '+56 9 8765 4321',
-        fechaContratacion: '03-06-2021'
+        id_mecanico: 2,
+        nombre: 'María González',
+        id_supervisor: 1
       },
       {
-        id: 3,
-        nombre: 'Roberto',
-        apellido: 'Silva',
-        especialidad: 'Electricidad',
-        experiencia: 12,
-        estado: 'Activo',
-        telefono: '+56 9 5555 1234',
-        fechaContratacion: '22-08-2018'
+        id_mecanico: 3,
+        nombre: 'Roberto Silva',
+        id_supervisor: null
       },
       {
-        id: 4,
-        nombre: 'Ana',
-        apellido: 'Torres',
-        especialidad: 'Frenos',
-        experiencia: 3,
-        estado: 'Activo',
-        telefono: '+56 9 9876 5432',
-        fechaContratacion: '10-11-2022'
+        id_mecanico: 4,
+        nombre: 'Ana Torres',
+        id_supervisor: 1
       },
       {
-        id: 5,
-        nombre: 'Luis',
-        apellido: 'Ramírez',
-        especialidad: 'Suspensión',
-        experiencia: 15,
-        estado: 'Inactivo',
-        telefono: '+56 9 1111 2222',
-        fechaContratacion: '05-03-2016'
+        id_mecanico: 5,
+        nombre: 'Luis Ramírez',
+        id_supervisor: 3
+      },
+      {
+        id_mecanico: 6,
+        nombre: 'Pedro García',
+        id_supervisor: 3
+      },
+      {
+        id_mecanico: 7,
+        nombre: 'Sofía Morales',
+        id_supervisor: null
       }
     ];
 
@@ -77,40 +57,35 @@ const MecanicosList = () => {
     }, 500);
   }, []);
 
-  const getEstadoBadgeClass = (estado: string) => {
-    switch (estado) {
-      case 'Activo':
-        return 'badge-success';
-      case 'En Servicio':
-        return 'badge-warning';
-      case 'Inactivo':
-        return 'badge-danger';
-      default:
-        return 'badge-primary';
+  const getSupervisorNombre = (idSupervisor: number | null) => {
+    if (idSupervisor === null) {
+      return 'Sin supervisor';
     }
+    const supervisor = mecanicos.find(m => m.id_mecanico === idSupervisor);
+    return supervisor ? supervisor.nombre : `Supervisor #${idSupervisor}`;
   };
 
   const columns: Column[] = [
     {
+      key: 'id_mecanico',
+      header: 'ID',
+      render: (_, row) => `MEC-${String(row.id_mecanico).padStart(3, '0')}`
+    },
+    {
       key: 'nombre',
-      header: 'Nombre Completo',
-      render: (_, row) => `${row.nombre} ${row.apellido}`
+      header: 'Nombre',
     },
     {
-      key: 'especialidad',
-      header: 'Especialidad',
+      key: 'id_supervisor',
+      header: 'Supervisor',
+      render: (_, row) => getSupervisorNombre(row.id_supervisor)
     },
     {
-      key: 'experiencia',
-      header: 'Experiencia',
-      render: (_, row) => `${row.experiencia} año${row.experiencia !== 1 ? 's' : ''}`
-    },
-    {
-      key: 'estado',
-      header: 'Estado',
+      key: 'rol',
+      header: 'Rol',
       render: (_, row) => (
-        <span className={`badge ${getEstadoBadgeClass(row.estado)}`}>
-          {row.estado}
+        <span className={`badge ${row.id_supervisor === null ? 'badge-primary' : 'badge-secondary'}`}>
+          {row.id_supervisor === null ? 'Supervisor' : 'Mecánico'}
         </span>
       )
     },

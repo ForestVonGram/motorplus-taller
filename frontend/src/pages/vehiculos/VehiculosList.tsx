@@ -15,14 +15,10 @@ const BRAND_LOGOS: Record<string, string> = {
 };
 
 interface Vehiculo {
-  id: number;
+  placa: string;
   marca: string;
-  modelo: string;
   anio: number;
-  matricula: string;
-  cliente: string;
-  ordenesCount: number;
-  ultimaFecha: string;
+  id_cliente: number;
 }
 
 const VehiculosList = () => {
@@ -33,94 +29,58 @@ const VehiculosList = () => {
     // Simulación de datos - reemplazar con llamada a API
     const mockData: Vehiculo[] = [
       {
-        id: 1,
+        placa: 'ABC123',
         marca: 'Ford',
-        modelo: 'Explorer 2020',
         anio: 2020,
-        matricula: 'JKPQ11',
-        cliente: 'Juan Carlos López',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 1
       },
       {
-        id: 2,
+        placa: 'XYZ789',
         marca: 'Audi',
-        modelo: 'A4 2010',
         anio: 2010,
-        matricula: 'DJHG018',
-        cliente: 'Magdalena Arancibia',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 2
       },
       {
-        id: 3,
+        placa: 'DEF456',
         marca: 'Mercedes',
-        modelo: 'Benz A250 2012',
         anio: 2012,
-        matricula: 'QTRJ12',
-        cliente: 'Joaquín Montecinos',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 3
       },
       {
-        id: 4,
+        placa: 'GHI789',
         marca: 'Land Rover',
-        modelo: 'Evoque 2009',
         anio: 2009,
-        matricula: 'HGLQ90',
-        cliente: 'Felipe Toloza',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 4
       },
       {
-        id: 5,
+        placa: 'JKL012',
         marca: 'Audi',
-        modelo: 'Q5 2010',
         anio: 2010,
-        matricula: 'LQRQ12',
-        cliente: 'María Paz Jiménez',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 5
       },
       {
-        id: 6,
+        placa: 'MNO345',
         marca: 'Toyota',
-        modelo: '4Runner 2008',
         anio: 2008,
-        matricula: 'PQKL22',
-        cliente: 'Héctor Reyes',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 1
       },
       {
-        id: 7,
+        placa: 'PQR678',
         marca: 'BMW',
-        modelo: 'M4 2020',
         anio: 2020,
-        matricula: 'KQRT12',
-        cliente: 'Patricia Sánchez',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 2
       },
       {
-        id: 8,
+        placa: 'STU901',
         marca: 'Volkswagen',
-        modelo: 'Golf GTI',
         anio: 2019,
-        matricula: 'YT9103',
-        cliente: 'Marcial Fernández',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 3
       },
       {
-        id: 9,
+        placa: 'VWX234',
         marca: 'Fiat',
-        modelo: 'Fiorino 2021',
         anio: 2021,
-        matricula: 'KPLQ91',
-        cliente: 'Karl Stevenson',
-        ordenesCount: 1,
-        ultimaFecha: '09-01-2022'
+        id_cliente: 4
       }
     ];
 
@@ -132,8 +92,12 @@ const VehiculosList = () => {
 
   const columns: Column[] = [
     {
-      key: 'vehiculo',
-      header: 'Vehículo',
+      key: 'placa',
+      header: 'Placa',
+    },
+    {
+      key: 'marca',
+      header: 'Marca',
       render: (_, row) => (
         <div className="vehicle-info">
           <img 
@@ -142,29 +106,20 @@ const VehiculosList = () => {
             className="vehicle-logo"
           />
           <span className="vehicle-name">
-            {row.marca} {row.modelo}
+            {row.marca}
           </span>
         </div>
       )
     },
     {
-      key: 'cliente',
-      header: 'Cliente',
+      key: 'anio',
+      header: 'Año',
     },
     {
-      key: 'matricula',
-      header: 'Matrícula',
+      key: 'id_cliente',
+      header: 'ID Cliente',
+      render: (_, row) => `CLI-${String(row.id_cliente).padStart(3, '0')}`
     },
-    {
-      key: 'ordenes',
-      header: 'Órdenes',
-      render: (_, row) => `${row.ordenesCount} orden(es)`
-    },
-    {
-      key: 'fecha',
-      header: 'Fecha',
-      render: (_, row) => row.ultimaFecha
-    }
   ];
 
   const handleAction = (vehiculo: Vehiculo) => {

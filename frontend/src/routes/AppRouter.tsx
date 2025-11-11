@@ -17,6 +17,7 @@ const LoginPage = lazySafe(() => import('../pages/login/LoginPage'))
 const FacturasList = lazySafe(() => import('../pages/facturas/FacturasList'))
 const FacturasDetail = lazySafe(() => import('../pages/facturas/FacturasDetail'))
 const OrdenesList = lazySafe(() => import('../pages/ordenes/OrdenesList'))
+const MecanicosList = lazySafe(() => import('../pages/mecanicos/MecanicosList'))
 
 function NotFound() {
   return (
@@ -45,6 +46,9 @@ export default function AppRouter() {
 
           {/* Órdenes */}
           <Route path="/ordenes" element={<OrdenesList />} />
+
+          {/* Mecánicos */}
+          <Route path="/mecanicos" element={<MecanicosList />} />
 
           {/* Redirecciones comunes */}
           <Route path="/home" element={<Navigate to="/" replace />} />

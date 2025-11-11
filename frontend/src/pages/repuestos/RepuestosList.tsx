@@ -3,12 +3,10 @@ import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
 interface Repuesto {
-  id: number;
-  codigo: string;
+  id_repuesto: number;
   nombre: string;
-  proveedor: string;
-  stock: number;
-  precio: number; // en CLP
+  costo_unitario: string;
+  stock_disponible: number;
 }
 
 const currency = new Intl.NumberFormat('es-CL', {
@@ -23,11 +21,14 @@ const RepuestosList = () => {
 
   useEffect(() => {
     const mockData: Repuesto[] = [
-      { id: 1, codigo: 'RPS-0001', nombre: 'Filtro de Aceite', proveedor: 'ACME Parts', stock: 32, precio: 5990 },
-      { id: 2, codigo: 'RPS-0002', nombre: 'Pastillas de Freno', proveedor: 'FrenosPlus', stock: 8, precio: 24990 },
-      { id: 3, codigo: 'RPS-0003', nombre: 'Batería 60Ah', proveedor: 'EnergíaMax', stock: 15, precio: 89990 },
-      { id: 4, codigo: 'RPS-0004', nombre: 'Correa de Distribución', proveedor: 'Motores S.A.', stock: 5, precio: 45990 },
-      { id: 5, codigo: 'RPS-0005', nombre: 'Aceite 5W-30 (4L)', proveedor: 'LubriOil', stock: 54, precio: 21990 },
+      { id_repuesto: 1, nombre: 'Filtro de Aceite', costo_unitario: '5990.00', stock_disponible: 32 },
+      { id_repuesto: 2, nombre: 'Pastillas de Freno', costo_unitario: '24990.00', stock_disponible: 8 },
+      { id_repuesto: 3, nombre: 'Batería 60Ah', costo_unitario: '89990.00', stock_disponible: 15 },
+      { id_repuesto: 4, nombre: 'Correa de Distribución', costo_unitario: '45990.00', stock_disponible: 5 },
+      { id_repuesto: 5, nombre: 'Aceite 5W-30 (4L)', costo_unitario: '21990.00', stock_disponible: 54 },
+      { id_repuesto: 6, nombre: 'Amortiguadores Delanteros', costo_unitario: '125000.00', stock_disponible: 12 },
+      { id_repuesto: 7, nombre: 'Bomba de Agua', costo_unitario: '35500.00', stock_disponible: 20 },
+      { id_repuesto: 8, nombre: 'Filtro de Aire', costo_unitario: '8990.00', stock_disponible: 45 },
     ];
 
     setTimeout(() => {
@@ -37,11 +38,26 @@ const RepuestosList = () => {
   }, []);
 
   const columns: Column[] = [
-    { key: 'codigo', header: 'Código' },
+    { 
+      key: 'id_repuesto', 
+      header: 'ID',
+      render: (_, row) => `REP-${String(row.id_repuesto).padStart(3, '0')}`
+    },
     { key: 'nombre', header: 'Nombre' },
-    { key: 'proveedor', header: 'Proveedor' },
-    { key: 'stock', header: 'Stock' },
-    { key: 'precio', header: 'Precio', render: (value) => currency.format(value) },
+    { 
+      key: 'costo_unitario', 
+      header: 'Costo Unitario',
+      render: (_, row) => currency.format(parseFloat(row.costo_unitario))
+    },
+    { 
+      key: 'stock_disponible', 
+      header: 'Stock Disponible',
+      render: (_, row) => (
+        <span className={`badge ${row.stock_disponible < 10 ? 'badge-danger' : row.stock_disponible < 20 ? 'badge-warning' : 'badge-success'}`}>
+          {row.stock_disponible} unidades
+        </span>
+      )
+    },
   ];
 
   if (loading) return <div className="loading">Cargando repuestos...</div>;
