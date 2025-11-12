@@ -1,6 +1,7 @@
 package service;
 
 import dao.ClienteDAO;
+import dto.ClienteSearchDTO;
 import model.Cliente;
 
 import java.sql.SQLException;
@@ -32,5 +33,9 @@ public class ClienteService {
 
     public List<Cliente> listarTodosClientes() throws SQLException {
         return clienteDAO.findAll();
+    }
+
+    public List<ClienteSearchDTO> buscarClientesConVehiculos(String query) throws SQLException {
+        return clienteDAO.searchWithVehiculos(query);
     }
 }

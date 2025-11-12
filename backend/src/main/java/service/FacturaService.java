@@ -33,4 +33,8 @@ public class FacturaService {
     public List<Factura> listarTodasFacturas() throws SQLException {
         return facturaDAO.findAll();
     }
+
+    public List<Factura> buscarFacturas(String query) throws SQLException {
+        return facturaDAO.search(query);
+    }
 }

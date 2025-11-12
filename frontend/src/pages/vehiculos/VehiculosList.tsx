@@ -14,122 +14,84 @@ const BRAND_LOGOS: Record<string, string> = {
   'Fiat': 'https://cdn.worldvectorlogo.com/logos/fiat-1.svg',
 };
 
-interface Vehiculo {
+// DTO que retorna el backend en /api/vehiculos/search
+interface VehiculoDTO {
   placa: string;
   marca: string;
   anio: number;
-  id_cliente: number;
+  idCliente: number;
+  clienteNombre?: string;
+  clienteApellido?: string;
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
+
 const VehiculosList = () => {
-  const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
+  const [vehiculos, setVehiculos] = useState<VehiculoDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    // Simulación de datos - reemplazar con llamada a API
-    const mockData: Vehiculo[] = [
-      {
-        placa: 'ABC123',
-        marca: 'Ford',
-        anio: 2020,
-        id_cliente: 1
-      },
-      {
-        placa: 'XYZ789',
-        marca: 'Audi',
-        anio: 2010,
-        id_cliente: 2
-      },
-      {
-        placa: 'DEF456',
-        marca: 'Mercedes',
-        anio: 2012,
-        id_cliente: 3
-      },
-      {
-        placa: 'GHI789',
-        marca: 'Land Rover',
-        anio: 2009,
-        id_cliente: 4
-      },
-      {
-        placa: 'JKL012',
-        marca: 'Audi',
-        anio: 2010,
-        id_cliente: 5
-      },
-      {
-        placa: 'MNO345',
-        marca: 'Toyota',
-        anio: 2008,
-        id_cliente: 1
-      },
-      {
-        placa: 'PQR678',
-        marca: 'BMW',
-        anio: 2020,
-        id_cliente: 2
-      },
-      {
-        placa: 'STU901',
-        marca: 'Volkswagen',
-        anio: 2019,
-        id_cliente: 3
-      },
-      {
-        placa: 'VWX234',
-        marca: 'Fiat',
-        anio: 2021,
-        id_cliente: 4
-      }
-    ];
+    let alive = true;
+    setLoading(true);
 
-    setTimeout(() => {
-      setVehiculos(mockData);
-      setLoading(false);
-    }, 500);
-  }, []);
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const url = `${API_BASE}/api/vehiculos/search${query ? `?q=${encodeURIComponent(query)}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: VehiculoDTO[] = await res.json();
+        if (alive) setVehiculos(data);
+      } catch (e) {
+        if (alive) console.error('Error cargando vehículos', e);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250); // debounce
+
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [query]);
 
   const columns: Column[] = [
-    {
-      key: 'placa',
-      header: 'Placa',
-    },
+    { key: 'placa', header: 'Placa' },
     {
       key: 'marca',
       header: 'Marca',
-      render: (_, row) => (
+      render: (_, row: VehiculoDTO) => (
         <div className="vehicle-info">
-          <img 
-            src={BRAND_LOGOS[row.marca] || '/placeholder-logo.png'} 
+          <img
+            src={BRAND_LOGOS[row.marca] || '/placeholder-logo.png'}
             alt={row.marca}
             className="vehicle-logo"
           />
-          <span className="vehicle-name">
-            {row.marca}
-          </span>
+          <span className="vehicle-name">{row.marca}</span>
         </div>
-      )
+      ),
     },
+    { key: 'anio', header: 'Año' },
     {
-      key: 'anio',
-      header: 'Año',
-    },
-    {
-      key: 'id_cliente',
+      key: 'idCliente',
       header: 'ID Cliente',
-      render: (_, row) => `CLI-${String(row.id_cliente).padStart(3, '0')}`
+      render: (_, row: VehiculoDTO) => `CLI-${String(row.idCliente).padStart(3, '0')}`,
+    },
+    {
+      key: 'clienteNombre',
+      header: 'Cliente',
+      render: (_, row: VehiculoDTO) => {
+        const nombre = [row.clienteNombre, row.clienteApellido].filter(Boolean).join(' ');
+        return nombre || '-';
+      }
     },
   ];
 
-  const handleAction = (vehiculo: Vehiculo) => {
+  const handleAction = (vehiculo: VehiculoDTO) => {
     console.log('Ver detalle de:', vehiculo);
-    // Aquí puedes navegar a la página de detalle
   };
-
-  if (loading) {
-    return <div className="loading">Cargando vehículos...</div>;
-  }
 
   return (
     <div className="vehiculos-page">
@@ -137,13 +99,30 @@ const VehiculosList = () => {
         <h1>Vehículos</h1>
         <button className="btn-primary">+ Nuevo Vehículo</button>
       </div>
-      
-      <DataTable 
-        columns={columns} 
-        data={vehiculos}
-        onAction={handleAction}
-        actionLabel="En taller"
-      />
+
+      {/* Cuadro de búsqueda */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar por placa, marca, cliente o año..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="loading">Cargando vehículos...</div>
+          /*Cuando no hay vehículos*/
+      ) : vehiculos.length === 0 ? (
+        <div className="empty-state">No se encontraron vehículos.</div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={vehiculos}
+          onAction={handleAction}
+          actionLabel="En taller"
+        />
+      )}
     </div>
   );
 };

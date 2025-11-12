@@ -82,12 +82,41 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
 
     @Override
     public List<Factura> findAll() throws SQLException {
-        String sql = "SELECT id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden FROM " + TABLE;
+        String sql = "SELECT id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden FROM " + TABLE + " ORDER BY id_factura";
         List<Factura> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(map(rs));
+        }
+        return list;
+    }
+
+    /**
+     * Búsqueda de facturas por múltiples campos: id_factura, id_orden, estado_pago y fecha_emision
+     */
+    public List<Factura> search(String query) throws SQLException {
+        String q = query == null ? "" : query.trim();
+        if (q.isEmpty()) return findAll();
+
+        String like = "%" + q.toLowerCase() + "%";
+        String sql = "SELECT id_factura, costo_mano_obra, total, impuesto, fecha_emision, estado_pago, id_orden FROM " + TABLE +
+                " WHERE lower(CAST(id_factura AS TEXT)) LIKE ?" +
+                " OR lower(CAST(id_orden AS TEXT)) LIKE ?" +
+                " OR lower(estado_pago) LIKE ?" +
+                " OR to_char(fecha_emision, 'YYYY-MM-DD') LIKE ?" +
+                " ORDER BY id_factura";
+
+        List<Factura> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, "%" + q + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
         }
         return list;
     }

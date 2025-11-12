@@ -80,6 +80,25 @@ public class MecanicoDAO implements BaseDAO<Mecanico, Integer> {
         return list;
     }
 
+    /**
+     * Búsqueda de mecánicos por nombre (coincidencia parcial, case-insensitive).
+     */
+    public List<Mecanico> searchByNombre(String termino) throws SQLException {
+        if (termino == null || termino.trim().isEmpty()) {
+            return findAll();
+        }
+        String sql = "SELECT id_mecanico, nombre, id_supervisor FROM " + TABLE + " WHERE nombre ILIKE ? ORDER BY nombre ASC";
+        List<Mecanico> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + termino.trim() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
+
     public int countAll() throws SQLException {
         String sql = "SELECT COUNT(*) as total FROM " + TABLE;
         try (Connection conn = ConnectionManager.getConnection();

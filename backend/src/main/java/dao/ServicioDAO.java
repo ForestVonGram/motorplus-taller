@@ -72,12 +72,41 @@ public class ServicioDAO implements BaseDAO<Servicio, Integer> {
 
     @Override
     public List<Servicio> findAll() throws SQLException {
-        String sql = "SELECT id_servicio, nombre, descripcion, id_tipo FROM " + TABLE;
+        String sql = "SELECT id_servicio, nombre, descripcion, id_tipo FROM " + TABLE + " ORDER BY id_servicio";
         List<Servicio> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(map(rs));
+        }
+        return list;
+    }
+
+    /**
+     * Búsqueda de servicios por id, nombre, descripción o id_tipo (case-insensitive) con coincidencia parcial.
+     */
+    public List<Servicio> search(String query) throws SQLException {
+        String q = query == null ? "" : query.trim();
+        if (q.isEmpty()) return findAll();
+
+        String like = "%" + q.toLowerCase() + "%";
+        String sql = "SELECT id_servicio, nombre, descripcion, id_tipo FROM " + TABLE +
+                " WHERE lower(nombre) LIKE ?" +
+                " OR lower(COALESCE(descripcion, '')) LIKE ?" +
+                " OR lower(CAST(id_servicio AS TEXT)) LIKE ?" +
+                " OR lower(CAST(id_tipo AS TEXT)) LIKE ?" +
+                " ORDER BY id_servicio";
+
+        List<Servicio> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, like);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
         }
         return list;
     }

@@ -33,4 +33,8 @@ public class ServicioService {
     public List<Servicio> listarTodosServicios() throws SQLException {
         return servicioDAO.findAll();
     }
+
+    public List<Servicio> buscarServicios(String query) throws SQLException {
+        return servicioDAO.search(query);
+    }
 }

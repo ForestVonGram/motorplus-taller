@@ -1,5 +1,6 @@
 package controller;
 
+import dto.VehiculoSearchDTO;
 import model.Vehiculo;
 import service.VehiculoService;
 
@@ -56,6 +57,24 @@ public class VehiculoController {
         } catch (SQLException e) {
             System.err.println("Error al listar vehículos: " + e.getMessage());
             throw new RuntimeException("Error al listar vehículos", e);
+        }
+    }
+
+    public List<Vehiculo> buscarVehiculos(String query) {
+        try {
+            return vehiculoService.buscarVehiculos(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar vehículos: " + e.getMessage());
+            throw new RuntimeException("Error al buscar vehículos", e);
+        }
+    }
+
+    public List<VehiculoSearchDTO> buscarVehiculosConCliente(String query) {
+        try {
+            return vehiculoService.buscarVehiculosConCliente(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar vehículos (join cliente): " + e.getMessage());
+            throw new RuntimeException("Error al buscar vehículos (join cliente)", e);
         }
     }
 }

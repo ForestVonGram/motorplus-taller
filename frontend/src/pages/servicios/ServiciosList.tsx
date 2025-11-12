@@ -2,57 +2,86 @@ import { useEffect, useState } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
-interface Servicio {
-    id_servicio: number;
-    nombre: string;
-    descripcion: string;
-    id_tipo: number;
+// DTO entregado por backend (/api/servicios/search) via Jackson
+// Campos en camelCase según getters Java: idServicio, nombre, descripcion, idTipo
+interface ServicioDTO {
+  idServicio: number;
+  nombre: string;
+  descripcion?: string | null;
+  idTipo: number;
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
+
 const ServiciosList = () => {
-    const [servicios, setServicios] = useState<Servicio[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [servicios, setServicios] = useState<ServicioDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
-    useEffect(() => {
-        // Luego puedes reemplazar este mock por un fetch a tu API real (por ejemplo: fetch('/api/servicios'))
-        const mockData: Servicio[] = [
-            { id_servicio: 1, nombre: 'Cambio de aceite', descripcion: 'Incluye filtro y revisión general', id_tipo: 1 },
-            { id_servicio: 2, nombre: 'Alineación y balanceo', descripcion: 'Alineación de ejes y balanceo de las 4 ruedas', id_tipo: 2 },
-            { id_servicio: 3, nombre: 'Revisión de frenos', descripcion: 'Inspección, limpieza y ajuste de frenos', id_tipo: 3 },
-            { id_servicio: 4, nombre: 'Scanner y diagnóstico', descripcion: 'Lectura de códigos OBD-II y reporte de fallas', id_tipo: 4 },
-            { id_servicio: 5, nombre: 'Mantención 10.000 km', descripcion: 'Checklist completo según especificación del fabricante', id_tipo: 5 },
-        ];
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
 
-        setTimeout(() => {
-            setServicios(mockData);
-            setLoading(false);
-        }, 400);
-    }, []);
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const url = `${API_BASE}/api/servicios/search${query ? `?q=${encodeURIComponent(query)}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: ServicioDTO[] = await res.json();
+        if (alive) setServicios(data);
+      } catch (e) {
+        if (alive) console.error('Error cargando servicios', e);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250); // debounce
 
-    const columns: Column[] = [
-        { key: 'id_servicio', header: 'ID' },
-        { key: 'nombre', header: 'Nombre del Servicio' },
-        { key: 'descripcion', header: 'Descripción' },
-        { key: 'id_tipo', header: 'Tipo de Servicio (ID)' },
-    ];
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [query]);
 
-    if (loading) return <div className="loading">Cargando servicios...</div>;
+  const columns: Column[] = [
+    { key: 'idServicio', header: 'ID' },
+    { key: 'nombre', header: 'Nombre del Servicio' },
+    { key: 'descripcion', header: 'Descripción' },
+    { key: 'idTipo', header: 'Tipo de Servicio (ID)' },
+  ];
 
-    return (
-        <div className="vehiculos-page">
-            <div className="page-header">
-                <h1>Servicios</h1>
-                <button className="btn-primary">+ Nuevo Servicio</button>
-            </div>
+  return (
+    <div className="vehiculos-page">
+      <div className="page-header">
+        <h1>Servicios</h1>
+        <button className="btn-primary">+ Nuevo Servicio</button>
+      </div>
 
-            <DataTable
-                columns={columns}
-                data={servicios}
-                onAction={(s) => console.log('Ver detalle de:', s)}
-                actionLabel="Ver Detalle"
-            />
-        </div>
-    );
+      {/* Cuadro de búsqueda */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar por ID, nombre, descripción o tipo..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="loading">Cargando servicios...</div>
+      ) : servicios.length === 0 ? (
+        <div className="empty-state">No se encontraron servicios.</div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={servicios}
+          onAction={(s) => console.log('Ver detalle de:', s)}
+          actionLabel="Ver Detalle"
+        />
+      )}
+    </div>
+  );
 };
 
 export default ServiciosList;

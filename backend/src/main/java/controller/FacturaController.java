@@ -58,4 +58,13 @@ public class FacturaController {
             throw new RuntimeException("Error al listar facturas", e);
         }
     }
+
+    public List<Factura> buscarFacturas(String query) {
+        try {
+            return facturaService.buscarFacturas(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar facturas: " + e.getMessage());
+            throw new RuntimeException("Error al buscar facturas", e);
+        }
+    }
 }

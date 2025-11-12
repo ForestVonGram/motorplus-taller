@@ -2,71 +2,68 @@ import { useState, useEffect } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
-interface Cliente {
-  id_cliente: number;
+// DTO que retorna el backend en /api/clientes/search
+interface ClienteDTO {
+  idCliente: number;
   nombre: string;
   apellido: string;
-  contrasenia: string;
+  vehiculos: string; // placas separadas por coma
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
+
 const ClientesList = () => {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [clientes, setClientes] = useState<ClienteDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    // Intentar cargar desde el backend; si falla, usar mock de respaldo
+    let alive = true;
+    setLoading(true);
+
     const controller = new AbortController();
-    (async () => {
+    const timeout = setTimeout(async () => {
       try {
-        const res = await fetch('/api/clientes', { signal: controller.signal });
+        const url = `${API_BASE}/api/clientes/search${query ? `?q=${encodeURIComponent(query)}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: Cliente[] = await res.json();
-        setClientes(data);
+        const data: ClienteDTO[] = await res.json();
+        if (alive) setClientes(data);
       } catch (err) {
-        console.warn('Fallo al cargar clientes desde API, usando mock. Motivo:', err);
-        const mockData: Cliente[] = [
-          { id_cliente: 1, nombre: 'Juan Carlos', apellido: 'López', contrasenia: '********' },
-          { id_cliente: 2, nombre: 'Magdalena', apellido: 'Arancibia', contrasenia: '********' },
-          { id_cliente: 3, nombre: 'Roberto', apellido: 'Fernández', contrasenia: '********' },
-          { id_cliente: 4, nombre: 'Carolina', apellido: 'Muñoz', contrasenia: '********' },
-          { id_cliente: 5, nombre: 'Diego', apellido: 'Vargas', contrasenia: '********' },
-        ];
-        setClientes(mockData);
+        if (alive) {
+          console.error('Error al cargar clientes desde API:', err);
+          setClientes([]);
+        }
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
-    })();
-    return () => controller.abort();
-  }, []);
+    }, 250); // debounce
+
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [query]);
 
   const columns: Column[] = [
     {
-      key: 'id_cliente',
+      key: 'idCliente',
       header: 'ID',
-      render: (_, row) => `CLI-${String(row.id_cliente).padStart(3, '0')}`
+      render: (_, row: ClienteDTO) => `CLI-${String(row.idCliente).padStart(3, '0')}`
     },
+    { key: 'nombre', header: 'Nombre' },
+    { key: 'apellido', header: 'Apellido' },
     {
-      key: 'nombre',
-      header: 'Nombre',
-    },
-    {
-      key: 'apellido',
-      header: 'Apellido',
-    },
-    {
-      key: 'contrasenia',
-      header: 'Contraseña',
-      render: () => '********'
+      key: 'vehiculos',
+      header: 'Vehículos',
+      render: (_, row: ClienteDTO) => row.vehiculos || '-',
     },
   ];
 
-  const handleAction = (cliente: Cliente) => {
+  const handleAction = (cliente: ClienteDTO) => {
     console.log('Ver detalle de:', cliente);
   };
-
-  if (loading) {
-    return <div className="loading">Cargando clientes...</div>;
-  }
 
   return (
     <div className="vehiculos-page">
@@ -74,13 +71,29 @@ const ClientesList = () => {
         <h1>Clientes</h1>
         <button className="btn-primary">+ Nuevo Cliente</button>
       </div>
-      
-      <DataTable 
-        columns={columns} 
-        data={clientes}
-        onAction={handleAction}
-        actionLabel="Ver Detalle"
-      />
+
+      {/* Cuadro de búsqueda */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, apellido, ID o vehículo..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="loading">Cargando clientes...</div>
+      ) : clientes.length === 0 ? (
+        <div className="empty-state">No se encontraron clientes.</div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={clientes}
+          onAction={handleAction}
+          actionLabel="Ver Detalle"
+        />
+      )}
     </div>
   );
 };

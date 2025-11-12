@@ -58,4 +58,13 @@ public class RepuestoController {
             throw new RuntimeException("Error al listar repuestos", e);
         }
     }
+
+    public List<Repuesto> buscarRepuestos(String query) {
+        try {
+            return repuestoService.buscarRepuestos(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar repuestos: " + e.getMessage());
+            throw new RuntimeException("Error al buscar repuestos", e);
+        }
+    }
 }

@@ -2,102 +2,82 @@ import { useState, useEffect } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
-interface Mecanico {
-  id_mecanico: number;
+interface MecanicoDTO {
+  idMecanico: number;
   nombre: string;
-  id_supervisor: number | null;
+  idSupervisor: number | null;
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
+
 const MecanicosList = () => {
-  const [mecanicos, setMecanicos] = useState<Mecanico[]>([]);
+  const [mecanicos, setMecanicos] = useState<MecanicoDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    const mockData: Mecanico[] = [
-      {
-        id_mecanico: 1,
-        nombre: 'Carlos Mendoza',
-        id_supervisor: null
-      },
-      {
-        id_mecanico: 2,
-        nombre: 'María González',
-        id_supervisor: 1
-      },
-      {
-        id_mecanico: 3,
-        nombre: 'Roberto Silva',
-        id_supervisor: null
-      },
-      {
-        id_mecanico: 4,
-        nombre: 'Ana Torres',
-        id_supervisor: 1
-      },
-      {
-        id_mecanico: 5,
-        nombre: 'Luis Ramírez',
-        id_supervisor: 3
-      },
-      {
-        id_mecanico: 6,
-        nombre: 'Pedro García',
-        id_supervisor: 3
-      },
-      {
-        id_mecanico: 7,
-        nombre: 'Sofía Morales',
-        id_supervisor: null
-      }
-    ];
+    let alive = true;
+    setLoading(true);
 
-    setTimeout(() => {
-      setMecanicos(mockData);
-      setLoading(false);
-    }, 500);
-  }, []);
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const url = `${API_BASE}/api/mecanicos/search${query ? `?q=${encodeURIComponent(query)}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: MecanicoDTO[] = await res.json();
+        if (alive) setMecanicos(data);
+      } catch (err) {
+        if (alive) {
+          console.error('Error al cargar mecánicos desde API:', err);
+          setMecanicos([]);
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250); // debounce
+
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [query]);
 
   const getSupervisorNombre = (idSupervisor: number | null) => {
     if (idSupervisor === null) {
       return 'Sin supervisor';
     }
-    const supervisor = mecanicos.find(m => m.id_mecanico === idSupervisor);
+    const supervisor = mecanicos.find(m => m.idMecanico === idSupervisor);
     return supervisor ? supervisor.nombre : `Supervisor #${idSupervisor}`;
   };
 
   const columns: Column[] = [
     {
-      key: 'id_mecanico',
+      key: 'idMecanico',
       header: 'ID',
-      render: (_, row) => `MEC-${String(row.id_mecanico).padStart(3, '0')}`
+      render: (_, row: MecanicoDTO) => `MEC-${String(row.idMecanico).padStart(3, '0')}`
     },
+    { key: 'nombre', header: 'Nombre' },
     {
-      key: 'nombre',
-      header: 'Nombre',
-    },
-    {
-      key: 'id_supervisor',
+      key: 'idSupervisor',
       header: 'Supervisor',
-      render: (_, row) => getSupervisorNombre(row.id_supervisor)
+      render: (_, row: MecanicoDTO) => getSupervisorNombre(row.idSupervisor)
     },
     {
       key: 'rol',
       header: 'Rol',
-      render: (_, row) => (
-        <span className={`badge ${row.id_supervisor === null ? 'badge-primary' : 'badge-secondary'}`}>
-          {row.id_supervisor === null ? 'Supervisor' : 'Mecánico'}
+      render: (_, row: MecanicoDTO) => (
+        <span className={`badge ${row.idSupervisor === null ? 'badge-primary' : 'badge-secondary'}`}>
+          {row.idSupervisor === null ? 'Supervisor' : 'Mecánico'}
         </span>
       )
     },
   ];
 
-  const handleAction = (mecanico: Mecanico) => {
+  const handleAction = (mecanico: MecanicoDTO) => {
     console.log('Ver detalle de:', mecanico);
   };
-
-  if (loading) {
-    return <div className="loading">Cargando mecánicos...</div>;
-  }
 
   return (
     <div className="vehiculos-page">
@@ -105,13 +85,29 @@ const MecanicosList = () => {
         <h1>Mecánicos</h1>
         <button className="btn-primary">+ Nuevo Mecánico</button>
       </div>
-      
-      <DataTable 
-        columns={columns} 
-        data={mecanicos}
-        onAction={handleAction}
-        actionLabel="Ver Detalle"
-      />
+
+      {/* Cuadro de búsqueda */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar por nombre o ID de supervisor..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="loading">Cargando mecánicos...</div>
+      ) : mecanicos.length === 0 ? (
+        <div className="empty-state">No se encontraron mecánicos.</div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={mecanicos}
+          onAction={handleAction}
+          actionLabel="Ver Detalle"
+        />
+      )}
     </div>
   );
 };

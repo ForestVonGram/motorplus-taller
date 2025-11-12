@@ -33,4 +33,8 @@ public class MecanicoService {
     public List<Mecanico> listarTodosMecanicos() throws SQLException {
         return mecanicoDAO.findAll();
     }
+
+    public List<Mecanico> buscarMecanicosPorNombre(String termino) throws SQLException {
+        return mecanicoDAO.searchByNombre(termino);
+    }
 }

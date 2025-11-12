@@ -1,5 +1,6 @@
 package controller;
 
+import dto.ClienteSearchDTO;
 import model.Cliente;
 import service.ClienteService;
 
@@ -56,6 +57,15 @@ public class ClienteController {
         } catch (SQLException e) {
             System.err.println("Error al listar clientes: " + e.getMessage());
             throw new RuntimeException("Error al listar clientes", e);
+        }
+    }
+
+    public List<ClienteSearchDTO> buscarClientesConVehiculos(String query) {
+        try {
+            return clienteService.buscarClientesConVehiculos(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar clientes: " + e.getMessage());
+            throw new RuntimeException("Error al buscar clientes", e);
         }
     }
 }

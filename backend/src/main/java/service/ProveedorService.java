@@ -33,4 +33,8 @@ public class ProveedorService {
     public List<Proveedor> listarTodosProveedores() throws SQLException {
         return proveedorDAO.findAll();
     }
+
+    public List<Proveedor> buscarProveedoresPorNombre(String termino) throws SQLException {
+        return proveedorDAO.searchByNombre(termino);
+    }
 }

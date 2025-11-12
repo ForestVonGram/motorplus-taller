@@ -2,53 +2,87 @@ import { useEffect, useState } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
-interface Proveedor {
-    id_proveedor: number;
-    nombre: string;
+interface ProveedorDTO {
+  idProveedor: number;
+  nombre: string;
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
+
 const ProveedoresList = () => {
-    const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
-    useEffect(() => {
-        // Aquí luego puedes reemplazar el fetch con tu API real (por ejemplo: fetch('/api/proveedores'))
-        const mockData: Proveedor[] = [
-            { id_proveedor: 1, nombre: 'ACME Parts' },
-            { id_proveedor: 2, nombre: 'FrenosPlus' },
-            { id_proveedor: 3, nombre: 'EnergíaMax' },
-            { id_proveedor: 4, nombre: 'Motores S.A.' },
-            { id_proveedor: 5, nombre: 'LubriOil' },
-        ];
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
 
-        setTimeout(() => {
-            setProveedores(mockData);
-            setLoading(false);
-        }, 450);
-    }, []);
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const url = `${API_BASE}/api/proveedores/search${query ? `?q=${encodeURIComponent(query)}` : ''}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: ProveedorDTO[] = await res.json();
+        if (alive) setProveedores(data);
+      } catch (err) {
+        if (alive) {
+          console.error('Error al cargar proveedores desde API:', err);
+          setProveedores([]);
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250); // debounce
 
-    const columns: Column[] = [
-        { key: 'id_proveedor', header: 'ID' },
-        { key: 'nombre', header: 'Nombre del Proveedor' },
-    ];
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [query]);
 
-    if (loading) return <div className="loading">Cargando proveedores...</div>;
+  const columns: Column[] = [
+    {
+      key: 'idProveedor',
+      header: 'ID',
+      render: (_, row: ProveedorDTO) => `PROV-${String(row.idProveedor).padStart(3, '0')}`
+    },
+    { key: 'nombre', header: 'Nombre del Proveedor' },
+  ];
 
-    return (
-        <div className="vehiculos-page">
-            <div className="page-header">
-                <h1>Proveedores</h1>
-                <button className="btn-primary">+ Nuevo Proveedor</button>
-            </div>
+  return (
+    <div className="vehiculos-page">
+      <div className="page-header">
+        <h1>Proveedores</h1>
+        <button className="btn-primary">+ Nuevo Proveedor</button>
+      </div>
 
-            <DataTable
-                columns={columns}
-                data={proveedores}
-                onAction={(p) => console.log('Ver detalle de:', p)}
-                actionLabel="Ver Detalle"
-            />
-        </div>
-    );
+      {/* Cuadro de búsqueda */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="loading">Cargando proveedores...</div>
+      ) : proveedores.length === 0 ? (
+        <div className="empty-state">No se encontraron proveedores.</div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={proveedores}
+          onAction={(p) => console.log('Ver detalle de:', p)}
+          actionLabel="Ver Detalle"
+        />
+      )}
+    </div>
+  );
 };
 
 export default ProveedoresList;

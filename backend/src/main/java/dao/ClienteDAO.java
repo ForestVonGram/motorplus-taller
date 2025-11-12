@@ -81,4 +81,50 @@ public class ClienteDAO implements BaseDAO<Cliente, Integer> {
         }
         return list;
     }
+
+    // Búsqueda de clientes con columna de vehículos (placas agregadas)
+    public java.util.List<dto.ClienteSearchDTO> searchWithVehiculos(String query) throws SQLException {
+        String q = query == null ? "" : query.trim();
+        boolean hasText = !q.isEmpty();
+
+        String select = "SELECT c.id_cliente, c.nombre, c.apellido, " +
+                "COALESCE(string_agg(v.placa, ', ' ORDER BY v.placa), '') AS vehiculos " +
+                "FROM " + TABLE + " c " +
+                "LEFT JOIN vehiculo v ON v.id_cliente = c.id_cliente";
+
+        StringBuilder sb = new StringBuilder(select);
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        if (hasText) {
+            sb.append(" WHERE lower(c.nombre) LIKE ? OR lower(c.apellido) LIKE ? OR lower(CAST(c.id_cliente AS TEXT)) LIKE ? OR lower(v.placa) LIKE ? OR lower(v.marca) LIKE ?");
+            String like = "%" + q.toLowerCase() + "%";
+            params.add(like); // nombre
+            params.add(like); // apellido
+            params.add(like); // id_cliente como texto
+            params.add(like); // placa
+            params.add(like); // marca
+        }
+
+        sb.append(" GROUP BY c.id_cliente, c.nombre, c.apellido ORDER BY c.id_cliente");
+
+        java.util.List<dto.ClienteSearchDTO> list = new java.util.ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sb.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) ps.setString(i + 1, (String) p);
+                else if (p instanceof Integer) ps.setInt(i + 1, (Integer) p);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    dto.ClienteSearchDTO dto = new dto.ClienteSearchDTO();
+                    dto.setIdCliente(rs.getInt("id_cliente"));
+                    dto.setNombre(rs.getString("nombre"));
+                    dto.setApellido(rs.getString("apellido"));
+                    dto.setVehiculos(rs.getString("vehiculos"));
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
 }

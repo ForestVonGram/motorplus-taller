@@ -58,4 +58,13 @@ public class ServicioController {
             throw new RuntimeException("Error al listar servicios", e);
         }
     }
+
+    public List<Servicio> buscarServicios(String query) {
+        try {
+            return servicioService.buscarServicios(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar servicios: " + e.getMessage());
+            throw new RuntimeException("Error al buscar servicios", e);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package service;
 
 import dao.VehiculoDAO;
+import dto.VehiculoSearchDTO;
 import model.Vehiculo;
 
 import java.sql.SQLException;
@@ -32,5 +33,13 @@ public class VehiculoService {
 
     public List<Vehiculo> listarTodosVehiculos() throws SQLException {
         return vehiculoDAO.findAll();
+    }
+
+    public List<Vehiculo> buscarVehiculos(String query) throws SQLException {
+        return vehiculoDAO.search(query);
+    }
+
+    public List<VehiculoSearchDTO> buscarVehiculosConCliente(String query) throws SQLException {
+        return vehiculoDAO.searchWithCliente(query);
     }
 }

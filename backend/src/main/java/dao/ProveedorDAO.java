@@ -66,12 +66,31 @@ public class ProveedorDAO implements BaseDAO<Proveedor, Integer> {
 
     @Override
     public List<Proveedor> findAll() throws SQLException {
-        String sql = "SELECT id_proveedor, nombre FROM " + TABLE;
+        String sql = "SELECT id_proveedor, nombre FROM " + TABLE + " ORDER BY nombre ASC";
         List<Proveedor> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(map(rs));
+        }
+        return list;
+    }
+
+    /**
+     * Búsqueda de proveedores por nombre (coincidencia parcial, case-insensitive).
+     */
+    public List<Proveedor> searchByNombre(String termino) throws SQLException {
+        if (termino == null || termino.trim().isEmpty()) {
+            return findAll();
+        }
+        String sql = "SELECT id_proveedor, nombre FROM " + TABLE + " WHERE nombre ILIKE ? ORDER BY nombre ASC";
+        List<Proveedor> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + termino.trim() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
         }
         return list;
     }

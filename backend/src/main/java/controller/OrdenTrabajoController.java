@@ -58,4 +58,31 @@ public class OrdenTrabajoController {
             throw new RuntimeException("Error al listar órdenes de trabajo", e);
         }
     }
+
+    public List<OrdenTrabajo> buscarOrdenes(String query) {
+        try {
+            return ordenTrabajoService.buscarOrdenes(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar órdenes de trabajo: " + e.getMessage());
+            throw new RuntimeException("Error al buscar órdenes de trabajo", e);
+        }
+    }
+
+    public List<OrdenTrabajo> buscarOrdenesParaFacturar(String query) {
+        try {
+            return ordenTrabajoService.buscarOrdenesParaFacturar(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar órdenes para facturar: " + e.getMessage());
+            throw new RuntimeException("Error al buscar órdenes para facturar", e);
+        }
+    }
+
+    public List<OrdenTrabajo> buscarOrdenesParaRepuestos(String query) {
+        try {
+            return ordenTrabajoService.buscarOrdenesParaRepuestos(query);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar órdenes para repuestos: " + e.getMessage());
+            throw new RuntimeException("Error al buscar órdenes para repuestos", e);
+        }
+    }
 }

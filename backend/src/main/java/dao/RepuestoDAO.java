@@ -72,12 +72,36 @@ public class RepuestoDAO implements BaseDAO<Repuesto, Integer> {
 
     @Override
     public List<Repuesto> findAll() throws SQLException {
-        String sql = "SELECT id_repuesto, nombre, costo_unitario, stock_disponible FROM " + TABLE;
+        String sql = "SELECT id_repuesto, nombre, costo_unitario, stock_disponible FROM " + TABLE + " ORDER BY id_repuesto";
         List<Repuesto> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(map(rs));
+        }
+        return list;
+    }
+
+    /**
+     * Búsqueda de repuestos por id o nombre (case-insensitive) y soporte de coincidencia parcial.
+     */
+    public List<Repuesto> search(String query) throws SQLException {
+        String q = query == null ? "" : query.trim();
+        if (q.isEmpty()) return findAll();
+
+        String like = "%" + q.toLowerCase() + "%";
+        String sql = "SELECT id_repuesto, nombre, costo_unitario, stock_disponible FROM " + TABLE +
+                " WHERE lower(nombre) LIKE ? OR lower(CAST(id_repuesto AS TEXT)) LIKE ?" +
+                " ORDER BY id_repuesto";
+
+        List<Repuesto> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, like);
+            ps.setString(2, like);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
         }
         return list;
     }

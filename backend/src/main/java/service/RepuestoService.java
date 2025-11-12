@@ -33,4 +33,8 @@ public class RepuestoService {
     public List<Repuesto> listarTodosRepuestos() throws SQLException {
         return repuestoDAO.findAll();
     }
+
+    public List<Repuesto> buscarRepuestos(String query) throws SQLException {
+        return repuestoDAO.search(query);
+    }
 }

@@ -58,4 +58,13 @@ public class ProveedorController {
             throw new RuntimeException("Error al listar proveedores", e);
         }
     }
+
+    public List<Proveedor> buscarProveedoresPorNombre(String termino) {
+        try {
+            return proveedorService.buscarProveedoresPorNombre(termino);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar proveedores: " + e.getMessage());
+            throw new RuntimeException("Error al buscar proveedores", e);
+        }
+    }
 }

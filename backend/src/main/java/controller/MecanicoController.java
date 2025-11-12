@@ -58,4 +58,13 @@ public class MecanicoController {
             throw new RuntimeException("Error al listar mecánicos", e);
         }
     }
+
+    public List<Mecanico> buscarMecanicosPorNombre(String termino) {
+        try {
+            return mecanicoService.buscarMecanicosPorNombre(termino);
+        } catch (SQLException e) {
+            System.err.println("Error al buscar mecánicos: " + e.getMessage());
+            throw new RuntimeException("Error al buscar mecánicos", e);
+        }
+    }
 }

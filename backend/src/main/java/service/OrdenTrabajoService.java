@@ -33,4 +33,16 @@ public class OrdenTrabajoService {
     public List<OrdenTrabajo> listarTodasOrdenesTrabajo() throws SQLException {
         return ordenTrabajoDAO.findAll();
     }
+
+    public List<OrdenTrabajo> buscarOrdenes(String query) throws SQLException {
+        return ordenTrabajoDAO.search(query);
+    }
+
+    public List<OrdenTrabajo> buscarOrdenesParaFacturar(String query) throws SQLException {
+        return ordenTrabajoDAO.searchEligibleForInvoice(query);
+    }
+
+    public List<OrdenTrabajo> buscarOrdenesParaRepuestos(String query) throws SQLException {
+        return ordenTrabajoDAO.searchEligibleForParts(query);
+    }
 }
