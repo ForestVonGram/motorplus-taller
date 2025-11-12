@@ -86,3 +86,37 @@
   padding: 40px;
   font-size: 15px;
 }
+
+.loading-message {
+  background: white;
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 12px;
+  padding: 24px;
+  color: #856404;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.error-message p {
+  margin: 8px 0;
+}
+
+.error-message p:first-child {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.error-message p:last-child {
+  font-size: 14px;
+  color: #856404;
+  opacity: 0.8;
+}

@@ -91,4 +91,18 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
         }
         return list;
     }
+
+    public double getTotalCurrentMonth() throws SQLException {
+        String sql = "SELECT COALESCE(SUM(total), 0) as total_mes FROM " + TABLE + 
+                     " WHERE EXTRACT(MONTH FROM fecha_emision) = EXTRACT(MONTH FROM CURRENT_DATE) " +
+                     " AND EXTRACT(YEAR FROM fecha_emision) = EXTRACT(YEAR FROM CURRENT_DATE)";
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total_mes");
+            }
+            return 0.0;
+        }
+    }
 }

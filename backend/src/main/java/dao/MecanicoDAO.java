@@ -79,4 +79,16 @@ public class MecanicoDAO implements BaseDAO<Mecanico, Integer> {
         }
         return list;
     }
+
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) as total FROM " + TABLE;
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+            return 0;
+        }
+    }
 }

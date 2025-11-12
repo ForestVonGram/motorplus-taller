@@ -14,43 +14,29 @@ const ClientesList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const mockData: Cliente[] = [
-      {
-        id_cliente: 1,
-        nombre: 'Juan Carlos',
-        apellido: 'López',
-        contrasenia: '********'
-      },
-      {
-        id_cliente: 2,
-        nombre: 'Magdalena',
-        apellido: 'Arancibia',
-        contrasenia: '********'
-      },
-      {
-        id_cliente: 3,
-        nombre: 'Roberto',
-        apellido: 'Fernández',
-        contrasenia: '********'
-      },
-      {
-        id_cliente: 4,
-        nombre: 'Carolina',
-        apellido: 'Muñoz',
-        contrasenia: '********'
-      },
-      {
-        id_cliente: 5,
-        nombre: 'Diego',
-        apellido: 'Vargas',
-        contrasenia: '********'
-      },
-    ];
-
-    setTimeout(() => {
-      setClientes(mockData);
-      setLoading(false);
-    }, 500);
+    // Intentar cargar desde el backend; si falla, usar mock de respaldo
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch('/api/clientes', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: Cliente[] = await res.json();
+        setClientes(data);
+      } catch (err) {
+        console.warn('Fallo al cargar clientes desde API, usando mock. Motivo:', err);
+        const mockData: Cliente[] = [
+          { id_cliente: 1, nombre: 'Juan Carlos', apellido: 'López', contrasenia: '********' },
+          { id_cliente: 2, nombre: 'Magdalena', apellido: 'Arancibia', contrasenia: '********' },
+          { id_cliente: 3, nombre: 'Roberto', apellido: 'Fernández', contrasenia: '********' },
+          { id_cliente: 4, nombre: 'Carolina', apellido: 'Muñoz', contrasenia: '********' },
+          { id_cliente: 5, nombre: 'Diego', apellido: 'Vargas', contrasenia: '********' },
+        ];
+        setClientes(mockData);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => controller.abort();
   }, []);
 
   const columns: Column[] = [

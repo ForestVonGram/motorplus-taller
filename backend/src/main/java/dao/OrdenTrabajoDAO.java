@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrdenTrabajoDAO implements BaseDAO<OrdenTrabajo, Integer> {
-    private static final String TABLE = "orden_trabajo";
+    private static final String TABLE = "ordentrabajo";
 
     private OrdenTrabajo map(ResultSet rs) throws SQLException {
         OrdenTrabajo o = new OrdenTrabajo();
@@ -86,5 +86,17 @@ public class OrdenTrabajoDAO implements BaseDAO<OrdenTrabajo, Integer> {
             while (rs.next()) list.add(map(rs));
         }
         return list;
+    }
+
+    public int countActiveOrders() throws SQLException {
+        String sql = "SELECT COUNT(*) as total FROM " + TABLE + " WHERE fecha_finalizacion IS NULL";
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+            return 0;
+        }
     }
 }
