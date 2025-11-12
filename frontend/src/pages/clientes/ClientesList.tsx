@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -13,6 +14,7 @@ interface ClienteDTO {
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
 const ClientesList = () => {
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState<ClienteDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -69,7 +71,7 @@ const ClientesList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Clientes</h1>
-        <button className="btn-primary">+ Nuevo Cliente</button>
+        <button className="btn-primary" onClick={() => navigate('/clientes/crear')}>+ Nuevo Cliente</button>
       </div>
 
       {/* Cuadro de búsqueda */}

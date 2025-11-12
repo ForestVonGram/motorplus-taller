@@ -16,19 +16,17 @@ public class ClienteDAO implements BaseDAO<Cliente, Integer> {
         c.setIdCliente(rs.getInt("id_cliente"));
         c.setNombre(rs.getString("nombre"));
         c.setApellido(rs.getString("apellido"));
-        c.setContrasenia(rs.getString("contrasenia"));
         return c;
     }
 
     @Override
     public Cliente insert(Cliente entity) throws SQLException {
-        String sql = "INSERT INTO " + TABLE + " (id_cliente, nombre, apellido, contrasenia) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO " + TABLE + " (id_cliente, nombre, apellido) VALUES (?,?,?)";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, entity.getIdCliente());
             ps.setString(2, entity.getNombre());
             ps.setString(3, entity.getApellido());
-            ps.setString(4, entity.getContrasenia());
             ps.executeUpdate();
         }
         return entity;
@@ -36,13 +34,12 @@ public class ClienteDAO implements BaseDAO<Cliente, Integer> {
 
     @Override
     public boolean update(Cliente entity) throws SQLException {
-        String sql = "UPDATE " + TABLE + " SET nombre=?, apellido=?, contrasenia=? WHERE id_cliente=?";
+        String sql = "UPDATE " + TABLE + " SET nombre=?, apellido=? WHERE id_cliente=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, entity.getNombre());
             ps.setString(2, entity.getApellido());
-            ps.setString(3, entity.getContrasenia());
-            ps.setInt(4, entity.getIdCliente());
+            ps.setInt(3, entity.getIdCliente());
             return ps.executeUpdate() > 0;
         }
     }
@@ -59,7 +56,7 @@ public class ClienteDAO implements BaseDAO<Cliente, Integer> {
 
     @Override
     public Optional<Cliente> findById(Integer id) throws SQLException {
-        String sql = "SELECT id_cliente, nombre, apellido, contrasenia FROM " + TABLE + " WHERE id_cliente=?";
+        String sql = "SELECT id_cliente, nombre, apellido FROM " + TABLE + " WHERE id_cliente=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -72,7 +69,7 @@ public class ClienteDAO implements BaseDAO<Cliente, Integer> {
 
     @Override
     public List<Cliente> findAll() throws SQLException {
-        String sql = "SELECT id_cliente, nombre, apellido, contrasenia FROM " + TABLE;
+        String sql = "SELECT id_cliente, nombre, apellido FROM " + TABLE;
         List<Cliente> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

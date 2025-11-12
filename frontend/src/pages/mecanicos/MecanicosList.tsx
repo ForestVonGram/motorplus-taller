@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -11,6 +12,7 @@ interface MecanicoDTO {
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
 const MecanicosList = () => {
+  const navigate = useNavigate();
   const [mecanicos, setMecanicos] = useState<MecanicoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -83,7 +85,7 @@ const MecanicosList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Mecánicos</h1>
-        <button className="btn-primary">+ Nuevo Mecánico</button>
+        <button className="btn-primary" onClick={() => navigate('/mecanicos/crear')}>+ Nuevo Mecánico</button>
       </div>
 
       {/* Cuadro de búsqueda */}

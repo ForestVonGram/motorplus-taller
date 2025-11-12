@@ -134,4 +134,51 @@ public class FacturaDAO implements BaseDAO<Factura, Integer> {
             return 0.0;
         }
     }
+
+    // Facturas asociadas a un vehículo por su placa (JOIN factura -> ordentrabajo -> vehiculo)
+    public List<Factura> findByPlaca(String placa) throws SQLException {
+        String sql = "SELECT f.id_factura, f.costo_mano_obra, f.total, f.impuesto, f.fecha_emision, f.estado_pago, f.id_orden " +
+                "FROM " + TABLE + " f JOIN ordentrabajo o ON o.id_orden = f.id_orden " +
+                "JOIN vehiculo v ON v.placa = o.placa WHERE v.placa = ? ORDER BY f.fecha_emision DESC, f.id_factura DESC";
+        List<Factura> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, placa);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
+
+    // Facturas por idCliente (JOIN a vehiculo y ordentrabajo)
+    public List<Factura> findByCliente(int idCliente) throws SQLException {
+        String sql = "SELECT f.id_factura, f.costo_mano_obra, f.total, f.impuesto, f.fecha_emision, f.estado_pago, f.id_orden " +
+                "FROM " + TABLE + " f JOIN ordentrabajo o ON o.id_orden = f.id_orden " +
+                "JOIN vehiculo v ON v.placa = o.placa WHERE v.id_cliente = ? ORDER BY f.fecha_emision DESC, f.id_factura DESC";
+        List<Factura> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
+
+    // Obtiene nombre y apellido del cliente por id (usado por reporte FacturasPorCliente)
+    public String[] getClienteInfo(int idCliente) throws SQLException {
+        String sql = "SELECT nombre, apellido FROM cliente WHERE id_cliente = ?";
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new String[]{rs.getString("nombre"), rs.getString("apellido")};
+                }
+            }
+        }
+        return null;
+    }
 }

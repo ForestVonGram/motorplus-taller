@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -16,6 +17,7 @@ interface OrdenTrabajoDTO {
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
 const OrdenesList = () => {
+  const navigate = useNavigate();
   const [ordenes, setOrdenes] = useState<OrdenTrabajoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -102,7 +104,7 @@ const OrdenesList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Órdenes</h1>
-        <button className="btn-primary">+ Nueva Orden</button>
+        <button className="btn-primary" onClick={() => navigate('/ordenes/crear')}>+ Nueva Orden</button>
       </div>
 
       {/* Cuadro de búsqueda */}

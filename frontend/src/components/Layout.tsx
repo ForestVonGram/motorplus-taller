@@ -21,6 +21,7 @@ const Layout = ({ children }: LayoutProps) => {
     { path: '/repuestos', label: 'Repuestos', icon: '🔧' },
     { path: '/proveedores', label: 'Proveedores', icon: '🏭' },
     { path: '/servicios', label: 'Servicios', icon: '⚙️' },
+    { path: '/tipos-servicio', label: 'Tipos de servicio', icon: '🏷️' },
     { path: '/reportes', label: 'Reportes', icon: '📈' },
   ];
 

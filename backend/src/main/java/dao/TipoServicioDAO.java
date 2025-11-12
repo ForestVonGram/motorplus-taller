@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class TipoServicioDAO implements BaseDAO<TipoServicio, Integer> {
-    private static final String TABLE = "tipo_servicio";
+    // Nombre real de la tabla en la BD: "tiposervicio" (sin guion bajo)
+    private static final String TABLE = "tiposervicio";
 
     private TipoServicio map(ResultSet rs) throws SQLException {
         TipoServicio t = new TipoServicio();
@@ -69,12 +70,37 @@ public class TipoServicioDAO implements BaseDAO<TipoServicio, Integer> {
 
     @Override
     public List<TipoServicio> findAll() throws SQLException {
-        String sql = "SELECT id_tipo, nombre_tipo, descripcion_tipo FROM " + TABLE;
+        String sql = "SELECT id_tipo, nombre_tipo, descripcion_tipo FROM " + TABLE + " ORDER BY id_tipo";
         List<TipoServicio> list = new ArrayList<>();
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(map(rs));
+        }
+        return list;
+    }
+
+    /**
+     * Búsqueda por id_tipo, nombre_tipo o descripcion_tipo (coincidencia parcial, case-insensitive)
+     */
+    public List<TipoServicio> search(String query) throws SQLException {
+        String q = query == null ? "" : query.trim();
+        if (q.isEmpty()) return findAll();
+        String like = "%" + q.toLowerCase() + "%";
+        String sql = "SELECT id_tipo, nombre_tipo, descripcion_tipo FROM " + TABLE +
+                " WHERE lower(nombre_tipo) LIKE ?" +
+                " OR lower(COALESCE(descripcion_tipo, '')) LIKE ?" +
+                " OR lower(CAST(id_tipo AS TEXT)) LIKE ?" +
+                " ORDER BY id_tipo";
+        List<TipoServicio> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
         }
         return list;
     }

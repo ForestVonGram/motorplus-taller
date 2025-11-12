@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -10,6 +11,7 @@ interface ProveedorDTO {
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
 const ProveedoresList = () => {
+  const navigate = useNavigate();
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -56,7 +58,7 @@ const ProveedoresList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Proveedores</h1>
-        <button className="btn-primary">+ Nuevo Proveedor</button>
+        <button className="btn-primary" onClick={() => navigate('/proveedores/crear')}>+ Nuevo Proveedor</button>
       </div>
 
       {/* Cuadro de búsqueda */}

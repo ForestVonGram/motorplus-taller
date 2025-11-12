@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -19,6 +20,7 @@ const currency = new Intl.NumberFormat('es-CL', {
 });
 
 const RepuestosList = () => {
+  const navigate = useNavigate();
   const [repuestos, setRepuestos] = useState<RepuestoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -79,7 +81,7 @@ const RepuestosList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Repuestos</h1>
-        <button className="btn-primary">+ Nuevo Repuesto</button>
+        <button className="btn-primary" onClick={() => navigate('/repuestos/crear')}>+ Nuevo Repuesto</button>
       </div>
 
       {/* Cuadro de búsqueda */}

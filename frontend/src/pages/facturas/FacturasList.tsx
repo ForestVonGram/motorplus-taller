@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 
@@ -16,6 +17,7 @@ interface FacturaDTO {
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
 const FacturasList = () => {
+  const navigate = useNavigate();
   const [facturas, setFacturas] = useState<FacturaDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -119,7 +121,7 @@ const FacturasList = () => {
     <div className="vehiculos-page">
       <div className="page-header">
         <h1>Facturas</h1>
-        <button className="btn-primary">+ Nueva Factura</button>
+        <button className="btn-primary" onClick={() => navigate('/facturas/crear')}>+ Nueva Factura</button>
       </div>
 
       {/* Cuadro de búsqueda */}

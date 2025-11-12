@@ -219,4 +219,17 @@ public class OrdenTrabajoDAO implements BaseDAO<OrdenTrabajo, Integer> {
         }
         return list;
     }
+
+    public List<OrdenTrabajo> findByPlaca(String placa) throws SQLException {
+        String sql = "SELECT id_orden, fecha_ingreso, diagnostico_inicial, fecha_finalizacion, placa FROM " + TABLE + " WHERE placa = ? ORDER BY fecha_ingreso DESC";
+        List<OrdenTrabajo> list = new ArrayList<>();
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, placa);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
 }
