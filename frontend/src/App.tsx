@@ -24,6 +24,17 @@ import './App.css';
 import ReportesList from './pages/reportes/ReportesList';
 import ReportesCreate from './pages/reportes/ReportesCreate';
 
+// Detalles
+import VehiculosDetail from './pages/vehiculos/VehiculosDetail';
+import ClientesDetail from './pages/clientes/ClientesDetail';
+import OrdenesDetail from './pages/ordenes/OrdenesDetail';
+import MecanicosDetail from './pages/mecanicos/MecanicosDetail';
+import FacturasDetail from './pages/facturas/FacturasDetail';
+import RepuestosDetail from './pages/repuestos/RepuestosDetail';
+import ProveedoresDetail from './pages/proveedores/ProveedoresDetail';
+import ServiciosDetail from './pages/servicios/ServiciosDetail';
+import TiposServiciosDetail from './pages/tipos-servicios/TiposServiciosDetail';
+
 function App() {
   return (
     <BrowserRouter>
@@ -36,38 +47,47 @@ function App() {
         {/* Vehículos */}
         <Route path="/vehiculos" element={<Layout><VehiculosList /></Layout>} />
         <Route path="/vehiculos/crear" element={<Layout><VehiculosCreate /></Layout>} />
+        <Route path="/vehiculos/:placa" element={<Layout><VehiculosDetail /></Layout>} />
         
         {/* Clientes */}
         <Route path="/clientes" element={<Layout><ClientesList /></Layout>} />
         <Route path="/clientes/crear" element={<Layout><ClientesCreate /></Layout>} />
+        <Route path="/clientes/:id" element={<Layout><ClientesDetail /></Layout>} />
         
         {/* Órdenes */}
         <Route path="/ordenes" element={<Layout><OrdenesList /></Layout>} />
         <Route path="/ordenes/crear" element={<Layout><OrdenesCreate /></Layout>} />
+        <Route path="/ordenes/:id" element={<Layout><OrdenesDetail /></Layout>} />
         
         {/* Mecánicos */}
         <Route path="/mecanicos" element={<Layout><MecanicosList /></Layout>} />
         <Route path="/mecanicos/crear" element={<Layout><MecanicosCreate /></Layout>} />
+        <Route path="/mecanicos/:id" element={<Layout><MecanicosDetail /></Layout>} />
         
         {/* Facturas */}
         <Route path="/facturas" element={<Layout><FacturasList /></Layout>} />
         <Route path="/facturas/crear" element={<Layout><FacturasCreate /></Layout>} />
+        <Route path="/facturas/:id" element={<Layout><FacturasDetail /></Layout>} />
         
         {/* Repuestos */}
         <Route path="/repuestos" element={<Layout><RepuestosList /></Layout>} />
         <Route path="/repuestos/crear" element={<Layout><RepuestosCreate /></Layout>} />
+        <Route path="/repuestos/:id" element={<Layout><RepuestosDetail /></Layout>} />
         
         {/* Proveedores */}
         <Route path="/proveedores" element={<Layout><ProveedoresList /></Layout>} />
         <Route path="/proveedores/crear" element={<Layout><ProveedoresCreate /></Layout>} />
+        <Route path="/proveedores/:id" element={<Layout><ProveedoresDetail /></Layout>} />
         
         {/* Servicios */}
         <Route path="/servicios" element={<Layout><ServiciosList /></Layout>} />
         <Route path="/servicios/crear" element={<Layout><ServiciosCreate /></Layout>} />
+        <Route path="/servicios/:id" element={<Layout><ServiciosDetail /></Layout>} />
 
         {/* Tipos de servicio */}
         <Route path="/tipos-servicio" element={<Layout><TiposServiciosList /></Layout>} />
         <Route path="/tipos-servicio/crear" element={<Layout><TiposServiciosCreate /></Layout>} />
+        <Route path="/tipos-servicio/:id" element={<Layout><TiposServiciosDetail /></Layout>} />
         
         {/* Reportes */}
         <Route path="/reportes" element={<Layout><ReportesList /></Layout>} />

@@ -64,7 +64,7 @@ const ClientesList = () => {
   ];
 
   const handleAction = (cliente: ClienteDTO) => {
-    console.log('Ver detalle de:', cliente);
+    navigate(`/clientes/${cliente.idCliente}`);
   };
 
   return (

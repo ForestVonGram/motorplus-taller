@@ -114,7 +114,7 @@ const FacturasList = () => {
   ];
 
   const handleAction = (factura: FacturaDTO) => {
-    console.log('Ver detalle de:', factura);
+    navigate(`/facturas/${factura.idFactura}`);
   };
 
   return (

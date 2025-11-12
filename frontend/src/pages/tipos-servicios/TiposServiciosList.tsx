@@ -70,7 +70,12 @@ export default function TiposServiciosList() {
       ) : tipos.length === 0 ? (
         <div className="empty-state">No se encontraron tipos de servicio.</div>
       ) : (
-        <DataTable columns={columns} data={tipos} />
+        <DataTable 
+          columns={columns} 
+          data={tipos} 
+          onAction={(t) => navigate(`/tipos-servicio/${t.idTipo}`)}
+          actionLabel="Ver Detalle"
+        />
       )}
     </div>
   );

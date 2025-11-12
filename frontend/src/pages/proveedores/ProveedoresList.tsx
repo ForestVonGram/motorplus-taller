@@ -79,7 +79,7 @@ const ProveedoresList = () => {
         <DataTable
           columns={columns}
           data={proveedores}
-          onAction={(p) => console.log('Ver detalle de:', p)}
+          onAction={(p) => navigate(`/proveedores/${p.idProveedor}`)}
           actionLabel="Ver Detalle"
         />
       )}

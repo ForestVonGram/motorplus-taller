@@ -144,11 +144,34 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
             var list = mecanicos.buscarMecanicosPorNombre(q);
             ctx.json(list);
         });
+        // Mecánicos: obtener por id
+        app.get("/api/mecanicos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = mecanicos.buscarMecanicoPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Mecánico no encontrado");
+        });
         // Mecánicos: crear
         app.post("/api/mecanicos", ctx -> {
             model.Mecanico body = ctx.bodyAsClass(model.Mecanico.class);
             model.Mecanico creado = mecanicos.crearMecanico(body);
             ctx.status(201).json(creado);
+        });
+        // Mecánicos: actualizar
+        app.put("/api/mecanicos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.Mecanico body = ctx.bodyAsClass(model.Mecanico.class);
+            body.setIdMecanico(id);
+            boolean ok = mecanicos.actualizarMecanico(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Mecánico no encontrado");
+        });
+        // Mecánicos: eliminar
+        app.delete("/api/mecanicos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = mecanicos.eliminarMecanico(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Mecánico no encontrado");
         });
 
         // Órdenes de trabajo: búsqueda por id/placa/diagnóstico/fechas
@@ -156,6 +179,13 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
             String q = Optional.ofNullable(ctx.queryParam("q")).orElse("");
             var list = ordenes.buscarOrdenes(q);
             ctx.json(list);
+        });
+        // Órdenes de trabajo: obtener por id
+        app.get("/api/ordenes/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = ordenes.buscarOrdenTrabajoPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Orden de trabajo no encontrada");
         });
 
         // Órdenes de trabajo: crear
@@ -174,6 +204,22 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
             } catch (Exception e) {
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear la orden: " + e.getMessage()));
             }
+        });
+        // Órdenes de trabajo: actualizar
+        app.put("/api/ordenes/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.OrdenTrabajo body = ctx.bodyAsClass(model.OrdenTrabajo.class);
+            body.setIdOrden(id);
+            boolean ok = ordenes.actualizarOrdenTrabajo(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Orden de trabajo no encontrada");
+        });
+        // Órdenes de trabajo: eliminar
+        app.delete("/api/ordenes/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = ordenes.eliminarOrdenTrabajo(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Orden de trabajo no encontrada");
         });
 
         // Facturas: búsqueda de órdenes elegibles para facturar
@@ -211,12 +257,42 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear el proveedor: " + e.getMessage()));
             }
         });
+        // Proveedores: obtener por id
+        app.get("/api/proveedores/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = proveedores.buscarProveedorPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Proveedor no encontrado");
+        });
+        // Proveedores: actualizar
+        app.put("/api/proveedores/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.Proveedor body = ctx.bodyAsClass(model.Proveedor.class);
+            body.setIdProveedor(id);
+            boolean ok = proveedores.actualizarProveedor(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Proveedor no encontrado");
+        });
+        // Proveedores: eliminar
+        app.delete("/api/proveedores/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = proveedores.eliminarProveedor(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Proveedor no encontrado");
+        });
 
         // Facturas: listado, búsqueda y creación
         app.get("/api/facturas", ctx -> ctx.json(facturas.listarTodasFacturas()));
         app.get("/api/facturas/search", ctx -> {
             String q = Optional.ofNullable(ctx.queryParam("q")).orElse("");
             ctx.json(facturas.buscarFacturas(q));
+        });
+        // Facturas: obtener por id
+        app.get("/api/facturas/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = facturas.buscarFacturaPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Factura no encontrada");
         });
         app.post("/api/facturas", ctx -> {
             model.Factura body = ctx.bodyAsClass(model.Factura.class);
@@ -234,6 +310,22 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
             } catch (Exception e) {
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear la factura: " + e.getMessage()));
             }
+        });
+        // Facturas: actualizar
+        app.put("/api/facturas/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.Factura body = ctx.bodyAsClass(model.Factura.class);
+            body.setIdFactura(id);
+            boolean ok = facturas.actualizarFactura(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Factura no encontrada");
+        });
+        // Facturas: eliminar
+        app.delete("/api/facturas/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = facturas.eliminarFactura(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Factura no encontrada");
         });
 
         // Repuestos: listado, búsqueda y creación
@@ -256,11 +348,41 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear el repuesto: " + e.getMessage()));
             }
         });
+        // Repuestos: obtener por id
+        app.get("/api/repuestos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = repuestos.buscarRepuestoPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Repuesto no encontrado");
+        });
+        // Repuestos: actualizar
+        app.put("/api/repuestos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.Repuesto body = ctx.bodyAsClass(model.Repuesto.class);
+            body.setIdRepuesto(id);
+            boolean ok = repuestos.actualizarRepuesto(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Repuesto no encontrado");
+        });
+        // Repuestos: eliminar
+        app.delete("/api/repuestos/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = repuestos.eliminarRepuesto(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Repuesto no encontrado");
+        });
 
         // Servicios: búsqueda
         app.get("/api/servicios/search", ctx -> {
             String q = Optional.ofNullable(ctx.queryParam("q")).orElse("");
             ctx.json(servicios.buscarServicios(q));
+        });
+        // Servicios: obtener por id
+        app.get("/api/servicios/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var opt = servicios.buscarServicioPorId(id);
+            if (opt.isPresent()) ctx.json(opt.get());
+            else ctx.status(404).result("Servicio no encontrado");
         });
 
         // Tipos de servicio: búsqueda y listado
@@ -288,6 +410,22 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear el tipo de servicio: " + e.getMessage()));
             }
         });
+        // Tipos de servicio: actualizar
+        app.put("/api/tipos-servicio/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.TipoServicio body = ctx.bodyAsClass(model.TipoServicio.class);
+            body.setIdTipo(id);
+            boolean ok = tiposServicio.actualizarTipoServicio(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Tipo de servicio no encontrado");
+        });
+        // Tipos de servicio: eliminar
+        app.delete("/api/tipos-servicio/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = tiposServicio.eliminarTipoServicio(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Tipo de servicio no encontrado");
+        });
 
         // Servicios: creación
         app.post("/api/servicios", ctx -> {
@@ -303,6 +441,22 @@ int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt).orE
             } catch (Exception e) {
                 ctx.status(500).json(java.util.Map.of("error", "No se pudo crear el servicio: " + e.getMessage()));
             }
+        });
+        // Servicios: actualizar
+        app.put("/api/servicios/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            model.Servicio body = ctx.bodyAsClass(model.Servicio.class);
+            body.setIdServicio(id);
+            boolean ok = servicios.actualizarServicio(body);
+            if (ok) ctx.json(body);
+            else ctx.status(404).result("Servicio no encontrado");
+        });
+        // Servicios: eliminar
+        app.delete("/api/servicios/{id}", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            boolean ok = servicios.eliminarServicio(id);
+            if (ok) ctx.status(204);
+            else ctx.status(404).result("Servicio no encontrado");
         });
 
         // Listado de mecánicos (opcional)

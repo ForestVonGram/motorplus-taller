@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import '../vehiculos/VehiculosList.css';
 import '../../components/DataTable.css';
+import ReactECharts from 'echarts-for-react';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:7001';
 
@@ -353,16 +354,42 @@ function FacturacionMensualView() {
   if (error) return <div className="empty-state">{error}</div>;
   if (!data) return null;
 
+  const meses = (data.meses||[]).slice().reverse();
+  const lineOptions = {
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (val: number) => currency.format(val)
+    },
+    xAxis: {
+      type: 'category',
+      data: meses.map((m:any)=> m.mes),
+      axisLabel: { rotate: 0 }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { formatter: (v:number) => currency.format(v).replace(/\,00$/, '') }
+    },
+    grid: { left: 40, right: 16, top: 20, bottom: 28 },
+    series: [
+      {
+        name: 'Facturación',
+        type: 'line',
+        smooth: true,
+        areaStyle: {},
+        showSymbol: false,
+        data: meses.map((m:any)=> m.total)
+      }
+    ]
+  } as any;
+
   return (
     <div>
       <h2>Facturación mensual</h2>
       <div style={sectionStyle}>Total últimos 6 meses: {currency.format(data.totalAnio)}</div>
       {title('Últimos 6 meses')}
-      <ul>
-        {(data.meses||[]).map((m:any)=> (
-          <li key={m.mes}>{m.mes}: {currency.format(m.total)}</li>
-        ))}
-      </ul>
+      <div style={{ width: '100%', height: 320 }}>
+        <ReactECharts option={lineOptions} notMerge={true} lazyUpdate={true} opts={{ renderer: 'svg' }} style={{ height: '100%', width: '100%' }} />
+      </div>
     </div>
   );
 }
@@ -443,111 +470,6 @@ function OrdenesRecientesView() {
   );
 }
 
-function AnalisisRentabilidadView() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any | null>(null);
-  const title = (t: string) => <h3 style={{ margin: '16px 0 8px 0' }}>{t}</h3>;
-  const currency = new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); setError(null);
-      try {
-        const res = await fetch(`${API_BASE}/api/reportes/analisis-rentabilidad`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        setData(json);
-      } catch (e:any) {
-        setError(e.message || 'Error al cargar');
-        setData(null);
-      } finally { setLoading(false); }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) return <div className="loading">Cargando...</div>;
-  if (error) return <div className="empty-state">{error}</div>;
-  if (!data) return null;
-
-  return (
-    <div>
-      <h2>Análisis de rentabilidad</h2>
-      {title('Margen por servicio')}
-      <ul>
-        {(data.servicios||[]).map((s:any)=> (
-          <li key={s.idServicio}>{s.nombre}: {currency.format(s.margenPromedio)}</li>
-        ))}
-      </ul>
-      {title('Margen por repuesto')}
-      <ul>
-        {(data.repuestos||[]).map((r:any)=> (
-          <li key={r.idRepuesto}>{r.nombre}: {currency.format(r.margenPromedio)}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function TrazabilidadOrdenesView() {
-  const [idOrden, setIdOrden] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any | null>(null);
-  const title = (t: string) => <h3 style={{ margin: '16px 0 8px 0' }}>{t}</h3>;
-
-  const fetchData = async () => {
-    const id = parseInt(idOrden.trim(), 10);
-    if (isNaN(id)) { setError('Ingrese un ID de orden válido'); return; }
-    setLoading(true); setError(null);
-    try {
-      const res = await fetch(`${API_BASE}/api/reportes/trazabilidad-ordenes/${id}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      setData(json);
-    } catch (e:any) {
-      setError(e.message || 'Error al cargar');
-      setData(null);
-    } finally { setLoading(false); }
-  };
-
-  return (
-    <div>
-      <div style={{ display:'flex', gap:8, marginBottom:12 }}>
-        <input value={idOrden} onChange={e=>setIdOrden(e.target.value)} placeholder="ID Orden (ej: 1)" />
-        <button className="btn-primary" onClick={fetchData}>Cargar</button>
-      </div>
-      {loading && <div className="loading">Cargando...</div>}
-      {error && <div className="empty-state">{error}</div>}
-      {data && (
-        <div>
-          <h2>Trazabilidad de órdenes</h2>
-          {title(`Orden #${data.orden?.idOrden}`)}
-          <ul>
-            <li>Placa: {data.orden?.placa}</li>
-            <li>Fecha ingreso: {data.orden?.fechaIngreso}</li>
-            <li>Fecha finalización: {data.orden?.fechaFinalizacion || 'En curso'}</li>
-            <li>Diagnóstico: {data.orden?.diagnosticoInicial}</li>
-            <li>Mecánico: {data.orden?.nombreMecanico || 'No asignado'}</li>
-          </ul>
-          {title('Servicios realizados')}
-          <ul>
-            {(data.servicios||[]).map((s:any)=> (
-              <li key={s.idServicio}>{s.nombreServicio}</li>
-            ))}
-          </ul>
-          {title('Repuestos utilizados')}
-          <ul>
-            {(data.repuestos||[]).map((r:any)=> (
-              <li key={r.idRepuesto}>{r.nombreRepuesto} · Cantidad: {r.cantidad}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function VentasVsCostosView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -575,13 +497,37 @@ function VentasVsCostosView() {
   if (error) return <div className="empty-state">{error}</div>;
   if (!data) return null;
 
-return (
+  const barOptions = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      valueFormatter: (val:number) => currency.format(val)
+    },
+    xAxis: { type: 'category', data: ['Ventas', 'Costos', 'Margen'] },
+    yAxis: { type: 'value', axisLabel: { formatter: (v:number)=> currency.format(v).replace(/\,00$/, '') } },
+    grid: { left: 40, right: 16, top: 20, bottom: 28 },
+    series: [{
+      type: 'bar',
+      data: [data.ventas, data.costos, data.margen],
+      itemStyle: {
+        color: function(params:any){
+          const colors = ['#228be6', '#fa5252', '#40c057'];
+          return colors[params.dataIndex] || '#228be6';
+        }
+      }
+    }]
+  } as any;
+
+  return (
     <div>
       <h2>Ventas vs Costos</h2>
-      <div style={{ display: 'flex', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         <div style={sectionStyle}><strong>Ventas</strong><div>{currency.format(data.ventas)}</div></div>
         <div style={sectionStyle}><strong>Costos</strong><div>{currency.format(data.costos)}</div></div>
         <div style={sectionStyle}><strong>Margen</strong><div>{currency.format(data.margen)} ({data.porcentajeMargen.toFixed(1)}%)</div></div>
+      </div>
+      <div style={{ width: '100%', height: 320 }}>
+        <ReactECharts option={barOptions} notMerge={true} lazyUpdate={true} opts={{ renderer: 'svg' }} style={{ height: '100%', width: '100%' }} />
       </div>
     </div>
   );
@@ -619,8 +565,9 @@ function KpiNegocioView() {
   if (!ordenes || !mensual || !vyc) return null;
 
   const totalUlt6m = mensual.totalAnio;
-  const ultimoMes = (mensual.meses||[])[0]?.total || 0;
-  const penultimoMes = (mensual.meses||[])[1]?.total || 0;
+  const meses = (mensual.meses||[]).slice().reverse();
+  const ultimoMes = meses[meses.length-1]?.total || 0;
+  const penultimoMes = meses[meses.length-2]?.total || 0;
   const trend = penultimoMes === 0 ? 0 : ((ultimoMes - penultimoMes) / penultimoMes) * 100;
 
   const card = (title: string, content: any) => (
@@ -630,10 +577,26 @@ function KpiNegocioView() {
     </div>
   );
 
+  const estadosOptions = {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'category', data: ['Pendientes','En Proceso','Completadas','Facturadas'] },
+    yAxis: { type: 'value' },
+    grid: { left: 40, right: 16, top: 20, bottom: 28 },
+    series: [{ type: 'bar', data: [ordenes.pendientes, ordenes.enProceso, ordenes.completadas, ordenes.facturadas], itemStyle: { color: '#228be6' } }]
+  } as any;
+
+  const mensualOptions = {
+    tooltip: { trigger: 'axis', valueFormatter: (v:number)=> currency.format(v) },
+    xAxis: { type: 'category', data: meses.map((m:any)=> m.mes) },
+    yAxis: { type: 'value', axisLabel: { formatter: (v:number)=> currency.format(v).replace(/\,00$/, '') } },
+    grid: { left: 40, right: 16, top: 20, bottom: 28 },
+    series: [{ type: 'line', smooth: true, areaStyle: {}, showSymbol: false, data: meses.map((m:any)=> m.total) }]
+  } as any;
+
   return (
     <div>
       <h2>KPIs de negocio</h2>
-      <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+      <div style={{ display:'flex', gap:16, flexWrap:'wrap', marginBottom: 12 }}>
         {card('Ventas (6m)', currency.format(totalUlt6m))}
         {card('Ventas último mes', currency.format(ultimoMes))}
         {card('Tendencia vs mes anterior', `${trend.toFixed(1)}%`)}
@@ -641,6 +604,14 @@ function KpiNegocioView() {
         {card('Completadas', ordenes.completadas)}
         {card('Facturadas', ordenes.facturadas)}
         {card('Margen', `${currency.format(vyc.margen)} (${vyc.porcentajeMargen.toFixed(1)}%)`)}
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <div style={{ width: '100%', height: 300 }}>
+          <ReactECharts option={estadosOptions} notMerge={true} lazyUpdate={true} opts={{ renderer: 'svg' }} style={{ height: '100%', width: '100%' }} />
+        </div>
+        <div style={{ width: '100%', height: 300 }}>
+          <ReactECharts option={mensualOptions} notMerge={true} lazyUpdate={true} opts={{ renderer: 'svg' }} style={{ height: '100%', width: '100%' }} />
+        </div>
       </div>
     </div>
   );

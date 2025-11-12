@@ -102,7 +102,7 @@ const RepuestosList = () => {
         <DataTable
           columns={columns}
           data={repuestos}
-          onAction={(r) => console.log('Ver detalle de:', r)}
+          onAction={(r) => navigate(`/repuestos/${r.idRepuesto}`)}
           actionLabel="Ver Detalle"
         />
       )}

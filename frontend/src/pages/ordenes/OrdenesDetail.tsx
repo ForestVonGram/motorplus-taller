@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../vehiculos/VehiculosList.css';
 
@@ -6,31 +6,22 @@ const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:70
 
 type ISODate = string;
 
-interface Factura {
-  idFactura: number | string;
-  costoManoObra: number | string;
-  total: number | string;
-  impuesto: number | string;
-  fechaEmision: ISODate;
-  estadoPago: string;
+interface OrdenTrabajo {
   idOrden: number | string;
+  fechaIngreso: ISODate;
+  diagnosticoInicial: string;
+  fechaFinalizacion?: ISODate | '' | null;
+  placa: string;
 }
 
-export default function FacturasDetail() {
+export default function OrdenesDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const [form, setForm] = useState<Factura | null>(null);
+  const [form, setForm] = useState<OrdenTrabajo | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const totalCalc = useMemo(() => {
-    if (!form) return 0;
-    const mano = Number(form.costoManoObra || 0);
-    const imp = Number(form.impuesto || 0);
-    return mano + imp;
-  }, [form?.costoManoObra, form?.impuesto]);
 
   useEffect(() => {
     let alive = true;
@@ -40,13 +31,19 @@ export default function FacturasDetail() {
       setError(null);
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/api/facturas/${encodeURIComponent(id || '')}`, { signal: controller.signal });
-        if (res.status === 404) throw new Error('Factura no encontrada');
+        const res = await fetch(`${API_BASE}/api/ordenes/${encodeURIComponent(id || '')}`, {
+          signal: controller.signal,
+        });
+        if (res.status === 404) throw new Error('Orden no encontrada');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (alive) setForm(data);
+        if (alive) {
+          // Normalizar fechaFinalizacion a '' si viene null para el input date
+          if (!data.fechaFinalizacion) data.fechaFinalizacion = '';
+          setForm(data);
+        }
       } catch (e: any) {
-        if (alive) setError(e?.message || 'Error cargando factura');
+        if (alive) setError(e?.message || 'Error cargando orden');
       } finally {
         if (alive) setLoading(false);
       }
@@ -59,7 +56,7 @@ export default function FacturasDetail() {
     };
   }, [id]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
@@ -70,22 +67,21 @@ export default function FacturasDetail() {
     setSaving(true);
     setError(null);
     try {
-      const payload = {
-        idFactura: Number(id),
-        costoManoObra: Number(form.costoManoObra),
-        total: Number(totalCalc),
-        impuesto: Number(form.impuesto),
-        fechaEmision: form.fechaEmision,
-        estadoPago: String(form.estadoPago || '').trim(),
-        idOrden: Number(form.idOrden),
+      const payload: any = {
+        idOrden: Number(id),
+        fechaIngreso: form.fechaIngreso,
+        diagnosticoInicial: String(form.diagnosticoInicial || '').trim(),
+        placa: String(form.placa || '').trim(),
       };
-      const res = await fetch(`${API_BASE}/api/facturas/${encodeURIComponent(id)}`, {
+      if (form.fechaFinalizacion) payload.fechaFinalizacion = form.fechaFinalizacion;
+
+      const res = await fetch(`${API_BASE}/api/ordenes/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      navigate('/facturas');
+      navigate('/ordenes');
     } catch (err: any) {
       setError(err?.message || 'Error al guardar cambios');
     } finally {
@@ -95,18 +91,18 @@ export default function FacturasDetail() {
 
   const onDelete = async () => {
     if (!id) return;
-    const ok = window.confirm(`¿Eliminar factura ${id}? Esta acción no se puede deshacer.`);
+    const ok = window.confirm(`¿Eliminar orden ${id}? Esta acción no se puede deshacer.`);
     if (!ok) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/api/facturas/${encodeURIComponent(id)}`, {
+      const res = await fetch(`${API_BASE}/api/ordenes/${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       if (res.status !== 204 && !res.ok) throw new Error(`HTTP ${res.status}`);
-      navigate('/facturas');
+      navigate('/ordenes');
     } catch (err: any) {
-      setError(err?.message || 'Error al eliminar factura');
+      setError(err?.message || 'Error al eliminar orden');
     } finally {
       setSaving(false);
     }
@@ -116,9 +112,9 @@ export default function FacturasDetail() {
     return (
       <div className="vehiculos-page">
         <div className="page-header">
-          <h1>Factura {id}</h1>
+          <h1>Orden {id}</h1>
         </div>
-        <div className="loading">Cargando factura...</div>
+        <div className="loading">Cargando orden...</div>
       </div>
     );
   }
@@ -127,11 +123,11 @@ export default function FacturasDetail() {
     return (
       <div className="vehiculos-page">
         <div className="page-header">
-          <h1>Factura {id}</h1>
+          <h1>Orden {id}</h1>
         </div>
         <div className="error-text">{error}</div>
         <div style={{ marginTop: 16 }}>
-          <button className="btn-secondary" onClick={() => navigate('/facturas')}>Volver al listado</button>
+          <button className="btn-secondary" onClick={() => navigate('/ordenes')}>Volver al listado</button>
         </div>
       </div>
     );
@@ -142,44 +138,32 @@ export default function FacturasDetail() {
   return (
     <div className="vehiculos-page">
       <div className="page-header">
-        <h1>Factura {id}</h1>
+        <h1>Orden {id}</h1>
         <div>
-          <button className="btn-secondary" onClick={() => navigate('/facturas')}>Volver</button>
+          <button className="btn-secondary" onClick={() => navigate('/ordenes')}>Volver</button>
         </div>
       </div>
 
       <form className="form-card" onSubmit={onSubmit}>
         <div className="form-row">
-          <label>N° Factura</label>
-          <input name="idFactura" value={form.idFactura} disabled />
-        </div>
-        <div className="form-row">
           <label>N° Orden</label>
-          <input name="idOrden" type="number" required value={form.idOrden} onChange={onChange} />
+          <input name="idOrden" value={form.idOrden} disabled />
         </div>
         <div className="form-row">
-          <label>Fecha Emisión</label>
-          <input name="fechaEmision" type="date" required value={form.fechaEmision || ''} onChange={onChange} />
+          <label>Placa</label>
+          <input name="placa" required value={form.placa || ''} onChange={onChange} />
         </div>
         <div className="form-row">
-          <label>Mano de Obra</label>
-          <input name="costoManoObra" type="number" required value={form.costoManoObra} onChange={onChange} />
+          <label>Fecha Ingreso</label>
+          <input name="fechaIngreso" type="date" required value={form.fechaIngreso || ''} onChange={onChange} />
         </div>
         <div className="form-row">
-          <label>Impuesto</label>
-          <input name="impuesto" type="number" required value={form.impuesto} onChange={onChange} />
+          <label>Diagnóstico Inicial</label>
+          <textarea name="diagnosticoInicial" required value={form.diagnosticoInicial || ''} onChange={onChange} />
         </div>
         <div className="form-row">
-          <label>Total</label>
-          <input name="total" type="number" readOnly value={totalCalc} />
-        </div>
-        <div className="form-row">
-          <label>Estado de Pago</label>
-          <select name="estadoPago" value={form.estadoPago || 'Pendiente'} onChange={onChange}>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Pagado">Pagado</option>
-            <option value="Cancelado">Cancelado</option>
-          </select>
+          <label>Fecha Finalización (opcional)</label>
+          <input name="fechaFinalizacion" type="date" value={form.fechaFinalizacion || ''} onChange={onChange} />
         </div>
 
         {error && <div className="error-text">{error}</div>}
@@ -189,7 +173,7 @@ export default function FacturasDetail() {
             {saving ? 'Procesando...' : 'Eliminar'}
           </button>
           <div style={{ flex: 1 }} />
-          <button type="button" className="btn-secondary" onClick={() => navigate('/facturas')} disabled={saving}>
+          <button type="button" className="btn-secondary" onClick={() => navigate('/ordenes')} disabled={saving}>
             Cancelar
           </button>
           <button type="submit" className="btn-primary" disabled={saving}>

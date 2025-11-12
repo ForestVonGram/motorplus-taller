@@ -92,7 +92,7 @@ const VehiculosList = () => {
   ];
 
   const handleAction = (vehiculo: VehiculoDTO) => {
-    console.log('Ver detalle de:', vehiculo);
+    navigate(`/vehiculos/${encodeURIComponent(vehiculo.placa)}`);
   };
 
   return (
@@ -122,7 +122,7 @@ const VehiculosList = () => {
           columns={columns}
           data={vehiculos}
           onAction={handleAction}
-          actionLabel="En taller"
+          actionLabel="Ver Detalle"
         />
       )}
     </div>

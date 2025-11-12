@@ -78,7 +78,7 @@ const ServiciosList = () => {
         <DataTable
           columns={columns}
           data={servicios}
-          onAction={(s) => console.log('Ver detalle de:', s)}
+          onAction={(s) => navigate(`/servicios/${s.idServicio}`)}
           actionLabel="Ver Detalle"
         />
       )}

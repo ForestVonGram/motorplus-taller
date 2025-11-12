@@ -78,7 +78,7 @@ const MecanicosList = () => {
   ];
 
   const handleAction = (mecanico: MecanicoDTO) => {
-    console.log('Ver detalle de:', mecanico);
+    navigate(`/mecanicos/${mecanico.idMecanico}`);
   };
 
   return (

@@ -97,7 +97,7 @@ const OrdenesList = () => {
   ];
 
   const handleAction = (orden: OrdenTrabajoDTO) => {
-    console.log('Ver detalle de:', orden);
+    navigate(`/ordenes/${orden.idOrden}`);
   };
 
   return (
